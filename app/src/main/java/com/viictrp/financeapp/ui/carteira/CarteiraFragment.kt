@@ -13,7 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
+import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
+import com.viictrp.financeapp.model.Orcamento
+import com.viictrp.financeapp.realm.RealmInitializer
+import io.realm.RealmResults
+import io.realm.kotlin.createObject
+import io.realm.kotlin.where
 
 class CarteiraFragment : Fragment() {
 
@@ -24,6 +30,12 @@ class CarteiraFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_carteira, container, false)
         val textView: TextView = root.findViewById(R.id.tx_vl_orcamento)
         val rvLancamentos = buildRecyclerView(root)
+        buildModelObservers(textView, rvLancamentos)
+        init()
+        return root
+    }
+
+    private fun buildModelObservers(textView: TextView, rvLancamentos: RecyclerView) {
         carteiraViewModel.text.observe(this, Observer {
             textView.text = it
         })
@@ -32,15 +44,31 @@ class CarteiraFragment : Fragment() {
             adapter.setList(it)
             adapter.notifyDataSetChanged()
         })
-        return root
+        carteiraViewModel.carteira.observe(this, Observer(System.out::println))
+    }
+
+    private fun init() {
+        val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
+        var carteira = realm.where<Carteira>().equalTo("mes", "AGOSTO").findFirst()
+        if (carteira == null) {
+            carteira = Carteira("AGOSTO")
+            val lastId = realm.where<Carteira>().max("id")
+            if (lastId != null) carteira.id = lastId.toLong() + 1 else carteira.id = 1
+            carteira.usuarioId = 1
+            realm.executeTransaction {
+                it.insert(carteira)
+            }
+            val orcamento = Orcamento()
+            orcamento.mes = "AGOSTO"
+        }
+        carteiraViewModel.carteira.value = carteira
     }
 
     private fun buildRecyclerView(root: View): RecyclerView {
         val context = this.activity!!.applicationContext
         val rvLancamentos: RecyclerView = root.findViewById(R.id.rv_lancamentos)
         rvLancamentos.adapter = LancamentoAdapter(listOf(), context)
-        val layoutManager = LinearLayoutManager(context)
-        rvLancamentos.layoutManager = layoutManager
+        rvLancamentos.layoutManager = LinearLayoutManager(context)
         return rvLancamentos
     }
 
