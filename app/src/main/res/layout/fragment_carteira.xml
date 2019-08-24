@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/orcamento_container"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:layout_height="400dp">
+
+            <TextView
+                android:id="@+id/tx_vl_orcamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/placeholder"
+                android:textAlignment="center"
+                android:textSize="35sp"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintBottom_toTopOf="@+id/action_buttons_container"
+                app:layout_constraintEnd_toEndOf="@+id/action_buttons_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="Orçamento do mês"
+                android:textAlignment="center"
+                android:textColor="@color/labelTintColor"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tx_vl_orcamento" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Gasto até o momento"
+                android:textAlignment="center"
+                android:textColor="@color/labelTintColor"
+                android:textSize="15sp"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
+                app:layout_constraintStart_toStartOf="@+id/orcamento_progress_bar" />
+
+            <TextView
+                android:id="@+id/gasto_ate_momento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="R$9.887,68"
+                android:textAlignment="center"
+                android:textColor="@color/labelTintColor"
+                android:textSize="20sp"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
+                app:layout_constraintEnd_toEndOf="@+id/orcamento_progress_bar" />
+
+            <ProgressBar
+                android:id="@+id/orcamento_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progress="78"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginStart="30dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:progressTint="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/action_buttons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <Button
+                    android:id="@+id/btn_novo_lancamento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:text="@string/title_lanc_carteira"
+                    android:textAlignment="center"
+                    android:textSize="13sp"
+                    android:background="@drawable/ripple"
+                    android:paddingTop="20dp"
+                    android:textColor="@color/labelTintColor"
+                    android:drawableTop="@drawable/ic_home_black_24dp"
+                    style="?android:attr/selectableItemBackgroundBorderless" />
+
+                <Button
+                    android:id="@+id/btn_orcamento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:text="@string/title_orc_carteira"
+                    android:textAlignment="center"
+                    android:textSize="13sp"
+                    android:background="@drawable/ripple"
+                    android:paddingTop="20dp"
+                    android:textColor="@color/labelTintColor"
+                    android:drawableTop="@drawable/ic_home_black_24dp"
+                    style="?android:attr/selectableItemBackgroundBorderless"/>
+
+                <Button
+                    android:id="@+id/btn_apagar_lancamento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:text="@string/title_del_lanc_carteira"
+                    android:textAlignment="center"
+                    android:textSize="13sp"
+                    android:background="@drawable/ripple"
+                    android:paddingTop="20dp"
+                    android:textColor="@color/labelTintColor"
+                    android:drawableTop="@drawable/ic_home_black_24dp"
+                    style="?android:attr/selectableItemBackgroundBorderless"/>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_lancamentos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/list_background"
+            android:paddingTop="14dp"/>
+
+        <View
+            android:id="@+id/vw_bottom_padding"
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</ScrollView>

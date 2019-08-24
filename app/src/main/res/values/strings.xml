@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FinanceApp</string>
+    <string name="title_home">Início</string>
+    <string name="title_carteira">Carteira</string>
+    <string name="title_cartao">Cartões</string>
+    <string name="title_lanc_carteira">Novo Lanç.</string>
+    <string name="title_orc_carteira">Orçamento.</string>
+    <string name="title_del_lanc_carteira">Apagar Lanç.</string>
+    <string name="placeholder">placeholder</string>
+</resources>
