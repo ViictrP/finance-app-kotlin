@@ -1,20 +1,20 @@
 package com.viictrp.financeapp.ui.carteira
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
+import com.viictrp.financeapp.model.Orcamento
 import java.util.*
 
 class CarteiraViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "R$12.586,99"
-    }
-
     private val _carteira = MutableLiveData<Carteira>().apply {
         value = Carteira(Calendar.AUGUST.toString())
+    }
+
+    private val _orcamento = MutableLiveData<Orcamento>().apply {
+        value = Orcamento(0.0, Calendar.AUGUST.toString())
     }
 
     private val _lancamentos = MutableLiveData<List<Lancamento>>().apply {
@@ -26,7 +26,7 @@ class CarteiraViewModel : ViewModel() {
         )
     }
 
-    val text: LiveData<String> = _text
     val lancamentos: MutableLiveData<List<Lancamento>> = _lancamentos
     val carteira: MutableLiveData<Carteira> = _carteira
+    val orcamento: MutableLiveData<Orcamento> = _orcamento
 }
