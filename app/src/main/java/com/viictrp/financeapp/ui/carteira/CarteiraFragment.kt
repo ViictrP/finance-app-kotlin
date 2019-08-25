@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -15,7 +16,6 @@ import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
-import io.realm.Realm
 import io.realm.kotlin.where
 
 class CarteiraFragment : Fragment() {
@@ -25,9 +25,17 @@ class CarteiraFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         carteiraViewModel = ViewModelProviders.of(this).get(CarteiraViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_carteira, container, false)
+        val btnOrcamento: Button = root.findViewById(R.id.btn_orcamento)
+        btnOrcamento.setOnClickListener(View.OnClickListener {
+            navigateTo("orcamento")
+        })
         buildModelObservers(root)
         init()
         return root
+    }
+
+    private fun navigateTo(fragment: String) {
+
     }
 
     private fun buildModelObservers(root: View) {
@@ -47,10 +55,16 @@ class CarteiraFragment : Fragment() {
         carteiraViewModel.carteira.observe(this, Observer(System.out::println))
     }
 
+    /**
+     * Inicializa os campos da tela
+     */
     private fun init() {
         loadCarteira()
     }
 
+    /**
+     * Busca a carteira do mês
+     */
     private fun loadCarteira() {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         val carteira = realm.where<Carteira>().equalTo("mes", "AGOSTO").findFirst()
@@ -62,6 +76,11 @@ class CarteiraFragment : Fragment() {
         }
     }
 
+    /**
+     * Carrega o orçamento da carteira
+     *
+     * @param carteira carteira
+     */
     private fun loadOrcamento(carteira: Carteira) {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         val orcamento = realm.where<Orcamento>().equalTo("carteiraId", carteira.id).findFirst()
@@ -72,6 +91,9 @@ class CarteiraFragment : Fragment() {
         }
     }
 
+    /**
+     * Cria um novo orçamento caso não exista na carteira
+     */
     private fun criarNovoOrcamento(carteiraId: Long?, mes: String?) {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         realm.executeTransactionAsync {
@@ -86,6 +108,9 @@ class CarteiraFragment : Fragment() {
         }
     }
 
+    /**
+     * Cria uma nova carteira caso não exista carteiras para o mês atual
+     */
     private fun criarNovaCarteira() {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         realm.executeTransactionAsync {
@@ -101,6 +126,9 @@ class CarteiraFragment : Fragment() {
         }
     }
 
+    /**
+     * Construindo a RecyclerView para listar os lançamentos
+     */
     private fun buildRecyclerView(root: View): RecyclerView {
         val context = this.activity!!.applicationContext
         val rvLancamentos: RecyclerView = root.findViewById(R.id.rv_lancamentos)
