@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="navigationTint">#888</color>
     <color name="colorPrimary">#4b830d</color>
     <color name="colorPrimaryDark">#4b835d</color>
     <color name="colorAccent">#D81B60</color>
     <color name="white">#FFFFFF</color>
     <color name="list_background">#FAFAFA</color>
+    <color name="list_background_darker">#CFCFCF</color>
     <color name="buttonTintColor">#006db3</color>
     <color name="labelTintColor">#383838</color>
     <color name="warningTintColor">#f57c00</color>

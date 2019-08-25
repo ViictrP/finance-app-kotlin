@@ -1,14 +1,15 @@
 package com.viictrp.financeapp
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.viictrp.financeapp.utils.Constantes
+import androidx.navigation.Navigation
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +30,13 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        supportActionBar?.hide()
+        supportActionBar?.title = "FinanceApp"
+        supportActionBar?.elevation = Constantes.zeroFloat
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.white)))
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return Navigation.findNavController(this,R.id.nav_host_fragment)
+            .navigateUp() || super.onSupportNavigateUp()
     }
 }

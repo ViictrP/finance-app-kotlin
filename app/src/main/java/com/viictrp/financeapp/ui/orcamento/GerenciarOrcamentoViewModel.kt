@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.viictrp.financeapp.model.Orcamento
 
-class OrcamentoViewModel : ViewModel() {
+class GerenciarOrcamentoViewModel : ViewModel() {
 
     var orcamento: MutableLiveData<Orcamento> = MutableLiveData()
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView
+    android:id="@+id/carteira_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -13,7 +14,7 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/orcamento_container"
+            android:id="@+id/orcamento_container_carteira"
             android:layout_width="match_parent"
             android:background="@color/white"
             android:layout_height="400dp">
@@ -54,7 +55,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/labelTintColor"
                 android:textSize="15sp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="20dp"
                 app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
                 app:layout_constraintStart_toStartOf="@+id/orcamento_progress_bar" />
 
@@ -67,21 +68,20 @@
                 android:textAlignment="center"
                 android:textColor="@color/labelTintColor"
                 android:textSize="20sp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="17dp"
                 app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
                 app:layout_constraintEnd_toEndOf="@+id/orcamento_progress_bar" />
 
             <ProgressBar
                 android:id="@+id/orcamento_progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
+                style="@style/CustomProgressBar"
+                android:theme="@style/CustomProgressBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="10dp"
                 android:progress="78"
-                android:layout_marginTop="60dp"
+                android:layout_marginTop="70dp"
                 android:layout_marginEnd="30dp"
                 android:layout_marginStart="30dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:progressTint="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />

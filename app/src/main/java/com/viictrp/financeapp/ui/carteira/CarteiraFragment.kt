@@ -3,12 +3,16 @@ package com.viictrp.financeapp.ui.carteira
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.viictrp.financeapp.R
@@ -16,28 +20,41 @@ import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.utils.Constantes
+import com.viictrp.financeapp.utils.StatusBarTheme
 import io.realm.kotlin.where
 
-class CarteiraFragment : Fragment() {
+class CarteiraFragment : Fragment(), OnClickListener {
 
+    private var navController: NavController? = null
     private lateinit var carteiraViewModel: CarteiraViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_carteira, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         carteiraViewModel = ViewModelProviders.of(this).get(CarteiraViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_carteira, container, false)
-        val btnOrcamento: Button = root.findViewById(R.id.btn_orcamento)
-        btnOrcamento.setOnClickListener(View.OnClickListener {
-            navigateTo("orcamento")
-        })
-        buildModelObservers(root)
+        StatusBarTheme.setLightStatusBar(view, this.activity!!)
+        navController = Navigation.findNavController(view)
+        view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
+        buildModelObservers(view)
         init()
-        return root
     }
 
-    private fun navigateTo(fragment: String) {
-
+    override fun onClick(view: View?) {
+        when(view!!.id) {
+            R.id.btn_orcamento -> navController!!.navigate(
+                R.id.action_navegacao_carteira_to_navegacao_orcamento,
+                bundleOf(Constantes.orcamentoIdKey to carteiraViewModel.orcamento.value?.id)
+            )
+        }
     }
 
+    /**
+     * Inicializa os observers
+     */
     private fun buildModelObservers(root: View) {
         val txValorOrcamento: TextView = root.findViewById(R.id.tx_vl_orcamento)
         val rvLancamentos = buildRecyclerView(root)
@@ -67,7 +84,7 @@ class CarteiraFragment : Fragment() {
      */
     private fun loadCarteira() {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
-        val carteira = realm.where<Carteira>().equalTo("mes", "AGOSTO").findFirst()
+        val carteira = realm.where<Carteira>().equalTo(Constantes.mes, "AGOSTO").findFirst()
         if (carteira != null) {
             loadOrcamento(carteira)
             carteiraViewModel.carteira.postValue(carteira)
@@ -83,7 +100,7 @@ class CarteiraFragment : Fragment() {
      */
     private fun loadOrcamento(carteira: Carteira) {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
-        val orcamento = realm.where<Orcamento>().equalTo("carteiraId", carteira.id).findFirst()
+        val orcamento = realm.where<Orcamento>().equalTo(Constantes.carteiraId, carteira.id).findFirst()
         if (orcamento == null) {
             criarNovoOrcamento(carteira.id, carteira.mes)
         } else {
@@ -97,7 +114,7 @@ class CarteiraFragment : Fragment() {
     private fun criarNovoOrcamento(carteiraId: Long?, mes: String?) {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         realm.executeTransactionAsync {
-            val lastId = it.where<Orcamento>().max("id")
+            val lastId = it.where<Orcamento>().max(Constantes.id)
             val orcamento = Orcamento(0.0, mes)
             orcamento.carteiraId = carteiraId
             if (lastId != null) orcamento.id = lastId.toLong() + 1 else orcamento.id = 1
@@ -115,7 +132,7 @@ class CarteiraFragment : Fragment() {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         realm.executeTransactionAsync {
             val newCarteira = Carteira("AGOSTO")
-            val lastId = it.where<Carteira>().max("id")
+            val lastId = it.where<Carteira>().max(Constantes.id)
             if (lastId != null) newCarteira.id = lastId.toLong() + 1 else newCarteira.id = 1
             newCarteira.usuarioId = 1
             it.insert(newCarteira)
