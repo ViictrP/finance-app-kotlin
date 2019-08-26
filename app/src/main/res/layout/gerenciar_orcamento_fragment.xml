@@ -20,17 +20,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <com.viictrp.financeapp.ui.custom.CurrencyEditText
         android:id="@+id/orcamentoInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:inputType="numberDecimal"
+        app:groupDivider="."
+        app:monetaryDivider=","
+        android:textSize="30sp"
         android:text="@string/placeholder"
         app:layout_constraintEnd_toEndOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <Button
+        android:id="@+id/btn_salvar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
