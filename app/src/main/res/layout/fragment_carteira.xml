@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<androidx.core.widget.NestedScrollView xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/carteira_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -16,25 +16,41 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/orcamento_container_carteira"
             android:layout_width="match_parent"
-            android:background="@color/white"
-            android:layout_height="400dp">
+            android:layout_height="400dp"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/tx_mes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="AGOSTO"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:layout_marginTop="80dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tx_vl_orcamento"
+                android:transitionName="orcamento_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/placeholder"
                 android:textAlignment="center"
+                android:textColor="@color/labelTintColor"
                 android:textSize="35sp"
-                android:textColor="@color/colorPrimary"
-                app:layout_constraintBottom_toTopOf="@+id/action_buttons_container"
-                app:layout_constraintEnd_toEndOf="@+id/action_buttons_container"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/tx_mes" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/tx_descricao"
+                android:transitionName="tx_descricao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -50,12 +66,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:gravity="center"
                 android:text="Gasto até o momento"
                 android:textAlignment="center"
                 android:textColor="@color/labelTintColor"
                 android:textSize="15sp"
-                android:layout_marginBottom="20dp"
                 app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
                 app:layout_constraintStart_toStartOf="@+id/orcamento_progress_bar" />
 
@@ -63,28 +79,28 @@
                 android:id="@+id/gasto_ate_momento"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="17dp"
                 android:gravity="center"
                 android:text="R$9.887,68"
                 android:textAlignment="center"
                 android:textColor="@color/labelTintColor"
                 android:textSize="20sp"
-                android:layout_marginBottom="17dp"
                 app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
                 app:layout_constraintEnd_toEndOf="@+id/orcamento_progress_bar" />
 
             <ProgressBar
                 android:id="@+id/orcamento_progress_bar"
                 style="@style/CustomProgressBar"
-                android:theme="@style/CustomProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="10dp"
-                android:progress="78"
+                android:layout_marginStart="30dp"
                 android:layout_marginTop="70dp"
                 android:layout_marginEnd="30dp"
-                android:layout_marginStart="30dp"
+                android:progress="78"
+                android:theme="@style/CustomProgressBar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView" />
+                app:layout_constraintTop_toBottomOf="@+id/tx_descricao" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/action_buttons_container"
@@ -97,45 +113,32 @@
 
                 <Button
                     android:id="@+id/btn_novo_lancamento"
+                    style="?android:attr/selectableItemBackgroundBorderless"
                     android:layout_width="wrap_content"
                     android:layout_height="100dp"
                     android:layout_weight="1"
+                    android:background="@drawable/ripple"
+                    android:drawableTop="@drawable/ic_shopping_bag_solid_24"
+                    android:paddingTop="20dp"
                     android:text="@string/title_lanc_carteira"
                     android:textAlignment="center"
-                    android:textSize="13sp"
-                    android:background="@drawable/ripple"
-                    android:paddingTop="20dp"
-                    android:textColor="@color/labelTintColor"
-                    android:drawableTop="@drawable/ic_home_black_24dp"
-                    style="?android:attr/selectableItemBackgroundBorderless" />
+                    android:textColor="@color/labelTintColorAccent"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/btn_orcamento"
+                    android:transitionName="btn_orcamento"
+                    style="?android:attr/selectableItemBackgroundBorderless"
                     android:layout_width="wrap_content"
                     android:layout_height="100dp"
                     android:layout_weight="1"
+                    android:background="@drawable/ripple"
+                    android:drawableTop="@drawable/ic_coins_solid_24"
+                    android:paddingTop="20dp"
                     android:text="@string/title_orc_carteira"
                     android:textAlignment="center"
-                    android:textSize="13sp"
-                    android:background="@drawable/ripple"
-                    android:paddingTop="20dp"
-                    android:textColor="@color/labelTintColor"
-                    android:drawableTop="@drawable/ic_home_black_24dp"
-                    style="?android:attr/selectableItemBackgroundBorderless"/>
-
-                <Button
-                    android:id="@+id/btn_apagar_lancamento"
-                    android:layout_width="wrap_content"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:text="@string/title_del_lanc_carteira"
-                    android:textAlignment="center"
-                    android:textSize="13sp"
-                    android:background="@drawable/ripple"
-                    android:paddingTop="20dp"
-                    android:textColor="@color/labelTintColor"
-                    android:drawableTop="@drawable/ic_home_black_24dp"
-                    style="?android:attr/selectableItemBackgroundBorderless"/>
+                    android:textColor="@color/labelTintColorAccent"
+                    android:textSize="13sp" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -147,7 +150,7 @@
             android:layout_height="match_parent"
             android:background="@color/list_background"
             android:nestedScrollingEnabled="false"
-            android:paddingTop="14dp"/>
+            android:paddingTop="40dp"/>
 
         <View
             android:id="@+id/vw_bottom_padding"

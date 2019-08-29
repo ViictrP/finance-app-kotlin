@@ -13,9 +13,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.transition.TransitionInflater
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.ui.transitions.TextSizeTransition
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import io.realm.kotlin.where
@@ -25,7 +28,12 @@ class OrcamentoFragment : Fragment(), OnClickListener {
     private lateinit var viewModel: OrcamentoViewModel
     private var navController: NavController? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        initializeSharedTransitions()
         viewModel = ViewModelProviders.of(this).get(OrcamentoViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_orcamento, container, false)
         root.findViewById<CardView>(R.id.cv_manage_orcamento).setOnClickListener(this)
@@ -46,8 +54,27 @@ class OrcamentoFragment : Fragment(), OnClickListener {
     override fun onClick(cardView: View?) {
         navController!!.navigate(
             R.id.action_navegacao_orcamento_to_gerenciarOrcamento,
-            bundleOf(Constantes.orcamentoIdKey to viewModel.orcamento.value?.id)
+            bundleOf(Constantes.orcamentoIdKey to viewModel.orcamento.value?.id),
+            null,
+            FragmentNavigatorExtras(
+                this.view!!.findViewById<TextView>(R.id.cv_manage_orcamento) to "btn_salvar"
+            )
         )
+    }
+
+    private fun initializeSharedTransitions() {
+        this.initializeEnterTransitions()
+        this.initializeReturnTransitions()
+    }
+
+    private fun initializeEnterTransitions() {
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+    }
+
+    private fun initializeReturnTransitions() {
+        sharedElementReturnTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
 
     /**

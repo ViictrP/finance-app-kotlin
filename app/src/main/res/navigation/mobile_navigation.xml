@@ -19,7 +19,19 @@
         tools:layout="@layout/fragment_carteira" >
         <action
             android:id="@+id/action_navegacao_carteira_to_navegacao_orcamento"
-            app:destination="@id/navegacao_orcamento" />
+            app:destination="@id/navegacao_orcamento"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@+id/navegacao_carteira" />
+        <action
+            android:id="@+id/action_navegacao_carteira_to_lancamentoFragment"
+            app:destination="@id/lancamentoFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <fragment
@@ -36,14 +48,30 @@
         <argument android:name="orcamentoId" app:argType="long" />
         <action
             android:id="@+id/action_navegacao_orcamento_to_gerenciarOrcamento"
-            app:destination="@id/gerenciarOrcamento" />
+            app:destination="@id/gerenciarOrcamento"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@+id/navegacao_orcamento"
+        />
     </fragment>
+
     <fragment
         android:id="@+id/gerenciarOrcamento"
         android:name="com.viictrp.financeapp.ui.orcamento.GerenciarOrcamento"
         android:label="Gerenciar orçamento"
         tools:layout="@layout/gerenciar_orcamento_fragment">
         <argument android:name="orcamentoId" app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lancamentoFragment"
+        android:name="com.viictrp.financeapp.ui.lancamento.LancamentoFragment"
+        android:label="Novo lançamento"
+        tools:layout="@layout/fragment_lancamento">
+        <argument android:name="carteiraId" app:argType="long" />
+        <argument android:name="faturaId" app:argType="long" />
     </fragment>
 
 </navigation>

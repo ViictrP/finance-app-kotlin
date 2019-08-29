@@ -12,7 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.viictrp.financeapp.R
@@ -28,6 +29,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
 
     private var navController: NavController? = null
     private lateinit var carteiraViewModel: CarteiraViewModel
+    private var txValorOrcamento: TextView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_carteira, container, false)
@@ -37,7 +39,8 @@ class CarteiraFragment : Fragment(), OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         carteiraViewModel = ViewModelProviders.of(this).get(CarteiraViewModel::class.java)
         StatusBarTheme.setLightStatusBar(view, this.activity!!)
-        navController = Navigation.findNavController(view)
+        navController = view.findNavController()
+        txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
         buildModelObservers(view)
         init()
@@ -47,7 +50,11 @@ class CarteiraFragment : Fragment(), OnClickListener {
         when(view!!.id) {
             R.id.btn_orcamento -> navController!!.navigate(
                 R.id.action_navegacao_carteira_to_navegacao_orcamento,
-                bundleOf(Constantes.orcamentoIdKey to carteiraViewModel.orcamento.value?.id)
+                bundleOf(Constantes.orcamentoIdKey to carteiraViewModel.orcamento.value?.id),
+                null,
+                FragmentNavigatorExtras(
+                    txValorOrcamento!! to "orcamento_value"
+                )
             )
         }
     }
@@ -56,11 +63,10 @@ class CarteiraFragment : Fragment(), OnClickListener {
      * Inicializa os observers
      */
     private fun buildModelObservers(root: View) {
-        val txValorOrcamento: TextView = root.findViewById(R.id.tx_vl_orcamento)
         val rvLancamentos = buildRecyclerView(root)
 
         carteiraViewModel.orcamento.observe(this, Observer {
-            txValorOrcamento.text = "R$${it.valor}"
+            txValorOrcamento!!.text = "R$${it.valor}"
         })
 
         carteiraViewModel.lancamentos.observe(this, Observer {

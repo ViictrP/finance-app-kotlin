@@ -1,18 +1,19 @@
 package com.viictrp.financeapp.ui.orcamento
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.Button
-import com.viictrp.financeapp.R
+import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.transition.TransitionInflater
 import com.google.android.material.snackbar.Snackbar
+import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
@@ -25,15 +26,19 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
     private var currencyEditText: CurrencyEditText? = null
     private var navController: NavController? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-       viewModel = ViewModelProviders.of(this).get(GerenciarOrcamentoViewModel::class.java)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        viewModel = ViewModelProviders.of(this).get(GerenciarOrcamentoViewModel::class.java)
         return inflater.inflate(R.layout.gerenciar_orcamento_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
-        view.findViewById<Button>(R.id.btn_salvar).setOnClickListener(this)
+        view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
         currencyEditText = view.findViewById<CurrencyEditText>(R.id.orcamentoInput)
         viewModel.valor.observe(this, Observer {
             currencyEditText!!.setText("$it")

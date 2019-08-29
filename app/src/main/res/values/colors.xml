@@ -9,6 +9,7 @@
     <color name="list_background_darker">#CFCFCF</color>
     <color name="buttonTintColor">#006db3</color>
     <color name="labelTintColor">#383838</color>
+    <color name="labelTintColorAccent">#666</color>
     <color name="warningTintColor">#f57c00</color>
     <color name="dangerTintColor">#c30000</color>
 </resources>
