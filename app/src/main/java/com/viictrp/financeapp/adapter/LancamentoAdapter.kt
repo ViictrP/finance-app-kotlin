@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Lancamento
-import kotlinx.android.synthetic.main.lancamento.view.*
+import kotlinx.android.synthetic.main.lancamento_recyclerview_item.view.*
 
 class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
                         private val context: Context) : Adapter<LancamentoAdapter.LancamentoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LancamentoViewHolder {
         val view = LayoutInflater.from(context)
-                                 .inflate(R.layout.lancamento, parent, false)
+                                 .inflate(R.layout.lancamento_recyclerview_item, parent, false)
         return LancamentoViewHolder(view)
     }
 

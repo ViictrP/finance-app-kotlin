@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="navigationTint">#888</color>
+    <color name="edit_text_bg">#FAFAFA</color>
     <color name="colorPrimary">#4b830d</color>
     <color name="colorPrimaryDark">#4b835d</color>
     <color name="colorAccent">#D81B60</color>
