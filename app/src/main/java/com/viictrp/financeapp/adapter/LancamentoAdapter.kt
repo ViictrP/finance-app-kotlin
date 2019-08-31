@@ -40,7 +40,7 @@ class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
         val valor = itemView.lancamento_valor
 
         fun bindView(lancamento: Lancamento) {
-            titulo.text = lancamento.titulo
+            titulo.text = lancamento.descricao
             descricao.text = lancamento.descricao
             data.text = lancamento.data
             icon.setImageResource(R.drawable.ic_receipt_solid)

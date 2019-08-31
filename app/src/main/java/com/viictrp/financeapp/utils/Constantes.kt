@@ -8,6 +8,7 @@ class Constantes {
         val zeroLong = 0L
 
         val orcamentoIdKey = "orcamentoId"
+        val carteiraIdKey = "carteiraId"
 
         // Realm
         val id = "id"

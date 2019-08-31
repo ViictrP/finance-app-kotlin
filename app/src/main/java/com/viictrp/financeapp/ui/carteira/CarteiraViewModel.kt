@@ -17,16 +17,7 @@ class CarteiraViewModel : ViewModel() {
         value = Orcamento(0.0, Calendar.AUGUST.toString())
     }
 
-    private val _lancamentos = MutableLiveData<List<Lancamento>>().apply {
-        value = listOf(
-            Lancamento("McDonalds", "Restaurante", "20/08 às 18h34", 680.99),
-            Lancamento("Apple", "Tecnologia", "20/08 às 18h34", 785.89),
-            Lancamento("Facebook", "Internet", "20/08 às 18h34", 1200.22),
-            Lancamento("Twitter", "Internet", "20/08 às 18h34", 1223.33)
-        )
-    }
-
-    val lancamentos: MutableLiveData<List<Lancamento>> = _lancamentos
+    val lancamentos: MutableLiveData<List<Lancamento>> = MutableLiveData()
     val carteira: MutableLiveData<Carteira> = _carteira
     val orcamento: MutableLiveData<Orcamento> = _orcamento
 }

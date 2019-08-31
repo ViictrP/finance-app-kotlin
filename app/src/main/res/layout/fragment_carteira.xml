@@ -72,8 +72,8 @@
                 android:textAlignment="center"
                 android:textColor="@color/labelTintColor"
                 android:textSize="15sp"
-                app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
-                app:layout_constraintStart_toStartOf="@+id/orcamento_progress_bar" />
+                app:layout_constraintBottom_toTopOf="@+id/pb_orcamento"
+                app:layout_constraintStart_toStartOf="@+id/pb_orcamento" />
 
             <TextView
                 android:id="@+id/gasto_ate_momento"
@@ -85,11 +85,11 @@
                 android:textAlignment="center"
                 android:textColor="@color/labelTintColor"
                 android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/orcamento_progress_bar"
-                app:layout_constraintEnd_toEndOf="@+id/orcamento_progress_bar" />
+                app:layout_constraintBottom_toTopOf="@+id/pb_orcamento"
+                app:layout_constraintEnd_toEndOf="@+id/pb_orcamento" />
 
             <ProgressBar
-                android:id="@+id/orcamento_progress_bar"
+                android:id="@+id/pb_orcamento"
                 style="@style/CustomProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="10dp"

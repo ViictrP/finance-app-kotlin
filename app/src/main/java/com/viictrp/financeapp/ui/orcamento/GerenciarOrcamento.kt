@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.transition.TransitionInflater
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Orcamento
@@ -39,7 +38,7 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
-        currencyEditText = view.findViewById<CurrencyEditText>(R.id.orcamentoInput)
+        currencyEditText = view.findViewById(R.id.orcamentoInput)
         viewModel.valor.observe(this, Observer {
             currencyEditText!!.setText("$it")
         })
