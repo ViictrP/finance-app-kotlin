@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="15sp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="25dp"
         android:textAlignment="center"
         android:text="@string/preencha_tudo"/>
 
@@ -37,7 +37,6 @@
         android:paddingBottom="10dp"
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
-        android:layout_marginBottom="4dp"
         android:hint="@string/titulo_placeholder"
         android:inputType="text"
         android:autofillHints="@string/titulo_placeholder"/>
@@ -56,6 +55,7 @@
         android:paddingBottom="10dp"
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
+        android:layout_marginTop="5dp"
         android:hint="@string/descricao_placeholder"
         android:inputType="text"
         android:autofillHints="@string/descricao_placeholder"/>

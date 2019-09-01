@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -17,6 +18,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
@@ -32,6 +34,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
     private var navController: NavController? = null
     private lateinit var carteiraViewModel: CarteiraViewModel
     private var txValorOrcamento: TextView? = null
+    private var txGastoAteMomento: TextView? = null
     private var rvLancamentos: RecyclerView? = null
     private var pbOrcamento: ProgressBar? = null
 
@@ -49,7 +52,8 @@ class CarteiraFragment : Fragment(), OnClickListener {
         StatusBarTheme.setLightStatusBar(view, this.activity!!)
         navController = view.findNavController()
         this.pbOrcamento = view.findViewById(R.id.pb_orcamento)
-        txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
+        this.txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
+        this.txGastoAteMomento = view.findViewById(R.id.tx_gasto_ate_momento)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
         view.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
         buildModelObservers(view)
@@ -109,7 +113,6 @@ class CarteiraFragment : Fragment(), OnClickListener {
         if (carteira != null) {
             loadOrcamento(carteira)
             carteiraViewModel.carteira.postValue(carteira)
-            loadLancamentos(carteira.id!!)
         } else {
             criarNovaCarteira()
         }
@@ -120,13 +123,44 @@ class CarteiraFragment : Fragment(), OnClickListener {
      *
      * @param carteiraId Id da carteiraLong
      */
-    private fun loadLancamentos(carteiraId: Long) {
+    private fun loadLancamentos(carteiraId: Long, valorOrcamento: Double) {
         val realm = RealmInitializer.getInstance(this.context!!)
         val lancamentos = realm.where<Lancamento>()
             .equalTo(Constantes.carteiraId, carteiraId)
             .findAll()
 
+        calcularValorTotalGasto(lancamentos, valorOrcamento)
         carteiraViewModel.lancamentos.postValue(lancamentos)
+    }
+
+    /**
+     * Calcula o valor total de lançamentos para setar o progresso do pnOrcamento.
+     *
+     * @param lancamentos - lançamentos da carteira
+     * @param valorTotalOrcamento - valor do orçamento do mês
+     */
+    private fun calcularValorTotalGasto(lancamentos: List<Lancamento>?, valorTotalOrcamento: Double) {
+        var valorTotal = 0.0
+        lancamentos?.forEach {
+            it.valor.let { value ->
+                valorTotal += value!!
+            }
+        }
+        this.txGastoAteMomento!!.text = "$valorTotal"
+        calcularPorcentagemProgressBar(valorTotal, valorTotalOrcamento)
+    }
+
+    /**
+     * Calcula o progresso do pbOrcamento de acordo com o valor total dos lançamentos
+     * e o valor do orçamento do mês
+     *
+     * @param valorTotal - valor total dos lançamentos
+     * @param valorTotalOrcamento - valor total do orçamento do mês
+     */
+    private fun calcularPorcentagemProgressBar(valorTotal: Double, valorTotalOrcamento: Double) {
+        this.pbOrcamento!!.progress =
+            if (valorTotal >= valorTotalOrcamento) 100
+            else ((valorTotal / valorTotalOrcamento) * 100).toInt()
     }
 
     /**
@@ -142,6 +176,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
             criarNovoOrcamento(carteira.id, carteira.mes)
         } else {
             carteiraViewModel.orcamento.postValue(orcamento)
+            loadLancamentos(carteira.id!!, orcamento.valor!!)
         }
     }
 

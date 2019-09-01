@@ -76,7 +76,7 @@
                 app:layout_constraintStart_toStartOf="@+id/pb_orcamento" />
 
             <TextView
-                android:id="@+id/gasto_ate_momento"
+                android:id="@+id/tx_gasto_ate_momento"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="17dp"
