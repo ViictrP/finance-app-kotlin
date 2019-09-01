@@ -2,6 +2,7 @@ package com.viictrp.financeapp
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
@@ -30,8 +31,11 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        supportActionBar?.title = "FinanceApp"
         supportActionBar?.elevation = Constantes.zeroFloat
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setCustomView(R.layout.custom_action_bar_layout)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.white)))
     }
 

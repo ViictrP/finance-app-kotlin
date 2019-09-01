@@ -8,6 +8,7 @@
     <string name="title_del_lanc_carteira">Apagar Lanç.</string>
     <string name="placeholder">placeholder</string>
     <string name="money_placeholder">10000</string>
+    <string name="month_placeholder">AGOSTO</string>
     <string name="descricao_placeholder">descrição</string>
     <string name="titulo_placeholder">título</string>
     <string name="valor_placeholder">R$0,00</string>

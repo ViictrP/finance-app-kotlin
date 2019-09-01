@@ -1,16 +1,16 @@
 package com.viictrp.financeapp.ui.carteira
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CalendarView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
-import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -25,12 +25,15 @@ import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.ui.custom.CustomCalendarView
+import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import io.realm.kotlin.where
+import java.util.*
 
-class CarteiraFragment : Fragment(), OnClickListener {
+class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
 
     private var navController: NavController? = null
     private lateinit var carteiraViewModel: CarteiraViewModel
@@ -38,7 +41,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
     private lateinit var txGastoAteMomento: TextView
     private lateinit var rvLancamentos: RecyclerView
     private lateinit var pbOrcamento: ProgressBar
-    private lateinit var calendarView: CalendarView
+    private lateinit var calendarView: CustomCalendarView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,6 +60,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
         this.txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
         this.txGastoAteMomento = view.findViewById(R.id.tx_gasto_ate_momento)
         this.calendarView = view.findViewById(R.id.calendarView)
+        this.calendarView.setOnMonthChangeListener(this)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
         view.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
         buildModelObservers(view)
@@ -78,6 +82,11 @@ class CarteiraFragment : Fragment(), OnClickListener {
                 bundleOf(Constantes.carteiraIdKey to carteiraViewModel.carteira.value?.id)
             )
         }
+    }
+
+    override fun onMonthChange(month: Int) {
+        val mes = this.calendarView.getMonthDescription(month)
+        loadCarteira(mes!!)
     }
 
     /**
@@ -103,21 +112,23 @@ class CarteiraFragment : Fragment(), OnClickListener {
     /**
      * Inicializa os campos da tela
      */
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun init() {
-        loadCarteira()
+        val mes = this.calendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH))
+        loadCarteira(mes!!)
     }
 
     /**
      * Busca a carteira do mês
      */
-    private fun loadCarteira() {
+    private fun loadCarteira(mes: String) {
         val realm = RealmInitializer.getInstance(this.context!!)
-        val carteira = realm.where<Carteira>().equalTo(Constantes.mes, "AGOSTO").findFirst()
+        val carteira = realm.where<Carteira>().equalTo(Constantes.mes, mes).findFirst()
         if (carteira != null) {
             loadOrcamento(carteira)
             carteiraViewModel.carteira.postValue(carteira)
         } else {
-            criarNovaCarteira()
+            criarNovaCarteira(mes)
         }
     }
 
@@ -142,14 +153,18 @@ class CarteiraFragment : Fragment(), OnClickListener {
      * @param lancamentos - lançamentos da carteira
      * @param valorTotalOrcamento - valor do orçamento do mês
      */
-    private fun calcularValorTotalGasto(lancamentos: List<Lancamento>?, valorTotalOrcamento: Double) {
+    private fun calcularValorTotalGasto(
+        lancamentos: List<Lancamento>?,
+        valorTotalOrcamento: Double
+    ) {
         var valorTotal = 0.0
         lancamentos?.forEach {
             it.valor.let { value ->
                 valorTotal += value!!
             }
         }
-        this.txGastoAteMomento.text = "$valorTotal".substring(0, valorTotal.toString().indexOf(".") + 2)
+        this.txGastoAteMomento.text =
+            "$valorTotal".substring(0, valorTotal.toString().indexOf(".") + 2)
         calcularPorcentagemProgressBar(valorTotal, valorTotalOrcamento)
     }
 
@@ -203,10 +218,10 @@ class CarteiraFragment : Fragment(), OnClickListener {
     /**
      * Cria uma nova carteira caso não exista carteiras para o mês atual
      */
-    private fun criarNovaCarteira() {
+    private fun criarNovaCarteira(mes: String) {
         val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
         realm.executeTransactionAsync {
-            val newCarteira = Carteira("AGOSTO")
+            val newCarteira = Carteira(mes)
             val lastId = it.where<Carteira>().max(Constantes.id)
             if (lastId != null) newCarteira.id = lastId.toLong() + 1 else newCarteira.id = 1
             newCarteira.usuarioId = 1

@@ -22,7 +22,6 @@ import io.realm.kotlin.where
 import java.util.*
 import java.text.SimpleDateFormat
 
-
 class LancamentoFragment : Fragment(), View.OnClickListener {
 
     private lateinit var viewModel: LancamentoViewModel
@@ -95,14 +94,15 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
             this.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             this.updateEtData()
         }
-        this.etData!!.setOnFocusChangeListener { _, _ ->
-            DatePickerDialog(
-                this.context!!,
-                dpDialog,
-                this.calendar.get(Calendar.YEAR),
-                this.calendar.get(Calendar.MONTH),
-                this.calendar.get(Calendar.DAY_OF_MONTH)
-            ).show()
+        this.etData!!.setOnFocusChangeListener { _, enter ->
+            if (enter)
+                DatePickerDialog(
+                    this.context!!,
+                    dpDialog,
+                    this.calendar.get(Calendar.YEAR),
+                    this.calendar.get(Calendar.MONTH),
+                    this.calendar.get(Calendar.DAY_OF_MONTH)
+                ).show()
         }
     }
 
