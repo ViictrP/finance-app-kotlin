@@ -83,7 +83,7 @@ class OrcamentoFragment : Fragment(), OnClickListener {
     private fun buildObservers(view: View) {
         val txtValorOrcamento: TextView = view.findViewById(R.id.tx_vl_orcamento)
         viewModel.orcamento.observe(this, Observer {
-            txtValorOrcamento.text = "R$${it.valor}"
+            txtValorOrcamento.text = "${it.valor}"
         })
     }
 

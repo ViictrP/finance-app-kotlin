@@ -7,6 +7,7 @@
     <string name="title_orc_carteira">Orçamento.</string>
     <string name="title_del_lanc_carteira">Apagar Lanç.</string>
     <string name="placeholder">placeholder</string>
+    <string name="money_placeholder">10000</string>
     <string name="descricao_placeholder">descrição</string>
     <string name="titulo_placeholder">título</string>
     <string name="valor_placeholder">R$0,00</string>
@@ -19,6 +20,7 @@
     <string name="gerenciar_orcamento_text">Insira o valor do orçamento para editar, depois clique em salvar para realizar a alteração.</string>
     <string name="novo_lancamento_subtitle">Adicionar novo lançamento.</string>
     <string name="preencha_tudo">Por favor preencha todos os campos.</string>
+    <string name="app_img_content_description">Logomarca do aplicativo.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

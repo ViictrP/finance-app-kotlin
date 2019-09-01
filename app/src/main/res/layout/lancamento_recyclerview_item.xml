@@ -33,7 +33,8 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="10dp"
             android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_dollar_sign_solid"
+            android:src="@drawable/ic_money_bag_with_dollar_symbol_24"
+            android:tint="@color/navigationTint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,7 +61,7 @@
             app:layout_constraintTop_toBottomOf="@+id/lancamento_titulo"
             tools:text="Restaurante" />
 
-        <TextView
+        <com.viictrp.financeapp.ui.custom.RialTextView
             android:id="@+id/lancamento_valor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -69,9 +70,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="15dp"
             android:textColor="@color/labelTintColor"
+            android:text="@string/money_placeholder"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lancamento_data"
-            tools:text="R$1200,00" />
+            app:layout_constraintTop_toBottomOf="@+id/lancamento_data" />
 
         <View
             android:id="@+id/line"

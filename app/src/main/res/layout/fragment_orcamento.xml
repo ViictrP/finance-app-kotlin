@@ -8,7 +8,7 @@
     android:background="@color/white"
     android:visibility="visible">
 
-    <TextView
+    <com.viictrp.financeapp.ui.custom.RialTextView
         android:id="@+id/tx_vl_orcamento"
         android:transitionName="orcamento_value"
         android:layout_width="match_parent"

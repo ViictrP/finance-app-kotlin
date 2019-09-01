@@ -6,10 +6,11 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CalendarView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -18,13 +19,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import io.realm.kotlin.where
@@ -33,10 +34,11 @@ class CarteiraFragment : Fragment(), OnClickListener {
 
     private var navController: NavController? = null
     private lateinit var carteiraViewModel: CarteiraViewModel
-    private var txValorOrcamento: TextView? = null
-    private var txGastoAteMomento: TextView? = null
-    private var rvLancamentos: RecyclerView? = null
-    private var pbOrcamento: ProgressBar? = null
+    private lateinit var txValorOrcamento: RialTextView
+    private lateinit var txGastoAteMomento: TextView
+    private lateinit var rvLancamentos: RecyclerView
+    private lateinit var pbOrcamento: ProgressBar
+    private lateinit var calendarView: CalendarView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +56,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
         this.pbOrcamento = view.findViewById(R.id.pb_orcamento)
         this.txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
         this.txGastoAteMomento = view.findViewById(R.id.tx_gasto_ate_momento)
+        this.calendarView = view.findViewById(R.id.calendarView)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
         view.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
         buildModelObservers(view)
@@ -67,7 +70,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
                 bundleOf(Constantes.orcamentoIdKey to carteiraViewModel.orcamento.value?.id),
                 null,
                 FragmentNavigatorExtras(
-                    txValorOrcamento!! to "orcamento_value"
+                    txValorOrcamento to "orcamento_value"
                 )
             )
             R.id.btn_novo_lancamento -> navController!!.navigate(
@@ -84,11 +87,11 @@ class CarteiraFragment : Fragment(), OnClickListener {
         this.rvLancamentos = buildRecyclerView(root)
 
         carteiraViewModel.orcamento.observe(this, Observer {
-            txValorOrcamento!!.text = "R$${it.valor}"
+            txValorOrcamento.text = "${it.valor}"
         })
 
         carteiraViewModel.lancamentos.observe(this, Observer {
-            val adapter = this.rvLancamentos!!.adapter as LancamentoAdapter
+            val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it)
             adapter.notifyDataSetChanged()
             //TODO atualizar progressbar e porcentagem
@@ -146,7 +149,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
                 valorTotal += value!!
             }
         }
-        this.txGastoAteMomento!!.text = "$valorTotal"
+        this.txGastoAteMomento.text = "$valorTotal".substring(0, valorTotal.toString().indexOf(".") + 2)
         calcularPorcentagemProgressBar(valorTotal, valorTotalOrcamento)
     }
 
@@ -158,7 +161,7 @@ class CarteiraFragment : Fragment(), OnClickListener {
      * @param valorTotalOrcamento - valor total do orçamento do mês
      */
     private fun calcularPorcentagemProgressBar(valorTotal: Double, valorTotalOrcamento: Double) {
-        this.pbOrcamento!!.progress =
+        this.pbOrcamento.progress =
             if (valorTotal >= valorTotalOrcamento) 100
             else ((valorTotal / valorTotalOrcamento) * 100).toInt()
     }

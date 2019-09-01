@@ -43,7 +43,6 @@ class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
             titulo.text = lancamento.titulo
             descricao.text = lancamento.descricao
             data.text = lancamento.data
-            icon.setImageResource(R.drawable.ic_money_bag_with_dollar_symbol_24)
             valor.text = "R$${lancamento.valor}"
         }
     }
