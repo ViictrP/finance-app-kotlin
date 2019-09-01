@@ -27,6 +27,10 @@ class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
         this.lancamentos = lancamentos
     }
 
+    fun getList(): List<Lancamento>? {
+        return this.lancamentos
+    }
+
     override fun onBindViewHolder(holder: LancamentoViewHolder, position: Int) {
         holder.bindView(lancamentos!![position])
     }
@@ -36,14 +40,13 @@ class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
         val titulo = itemView.lancamento_titulo
         val descricao = itemView.lancamento_descricao
         val data = itemView.lancamento_data
-        val icon = itemView.lancamento_icon
         val valor = itemView.lancamento_valor
 
         fun bindView(lancamento: Lancamento) {
             titulo.text = lancamento.titulo
             descricao.text = lancamento.descricao
             data.text = lancamento.data
-            valor.text = "R$${lancamento.valor}"
+            valor.text = "${lancamento.valor}"
         }
     }
 

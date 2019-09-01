@@ -103,7 +103,6 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it)
             adapter.notifyDataSetChanged()
-            //TODO atualizar progressbar e porcentagem
         })
 
         carteiraViewModel.carteira.observe(this, Observer(System.out::println))
