@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:textAlignment="center"
         android:text="@string/novo_lancamento_subtitle"/>
 
@@ -24,7 +24,29 @@
         android:text="@string/preencha_tudo"/>
 
     <EditText
+        android:id="@+id/et_lancamento_titulo"
+        android:drawableStart="@drawable/ic_align_to_left_24"
+        android:drawableTint="@color/navigationTint"
+        android:drawablePadding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/rounded_edittext"
+        android:textCursorDrawable="@drawable/edit_text_cursor"
+        android:textSize="22sp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:layout_marginBottom="4dp"
+        android:hint="@string/titulo_placeholder"
+        android:inputType="text"
+        android:autofillHints="@string/titulo_placeholder"/>
+
+    <EditText
         android:id="@+id/et_lancamento_descricao"
+        android:drawableStart="@drawable/ic_align_to_left_24"
+        android:drawableTint="@color/navigationTint"
+        android:drawablePadding="20dp"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/rounded_edittext"
@@ -40,6 +62,9 @@
 
     <com.viictrp.financeapp.ui.custom.CurrencyEditText
         android:id="@+id/et_lancamento_valor"
+        android:drawableStart="@drawable/ic_money_bag_with_dollar_symbol_24"
+        android:drawableTint="@color/navigationTint"
+        android:drawablePadding="20dp"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/rounded_edittext"
@@ -48,7 +73,7 @@
         android:inputType="numberDecimal"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:textSize="22sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingEnd="20dp"
@@ -58,6 +83,9 @@
 
     <EditText
         android:id="@+id/et_lancamento_data"
+        android:drawableStart="@drawable/calendar_24"
+        android:drawableTint="@color/navigationTint"
+        android:drawablePadding="20dp"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/rounded_edittext"
@@ -66,7 +94,7 @@
         android:inputType="date"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:textSize="22sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingEnd="20dp"
@@ -74,6 +102,9 @@
 
     <EditText
         android:id="@+id/et_lancamento_qt_parcelas"
+        android:drawableStart="@drawable/ic_expensive_24"
+        android:drawableTint="@color/navigationTint"
+        android:drawablePadding="20dp"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/rounded_edittext"
@@ -82,7 +113,7 @@
         android:inputType="number"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:textSize="22sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingEnd="20dp"

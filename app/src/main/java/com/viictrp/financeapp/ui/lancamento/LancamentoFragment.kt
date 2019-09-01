@@ -1,5 +1,6 @@
 package com.viictrp.financeapp.ui.lancamento
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,9 @@ import com.viictrp.financeapp.realm.RealmInitializer
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.utils.Constantes
 import io.realm.kotlin.where
+import java.util.*
+import java.text.SimpleDateFormat
+
 
 class LancamentoFragment : Fragment(), View.OnClickListener {
 
@@ -27,10 +31,13 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private var navController: NavController? = null
 
     // EditTexts
+    private var etTitulo: EditText? = null
     private var etDescricao: EditText? = null
     private var etValor: CurrencyEditText? = null
     private var etData: EditText? = null
     private var etQtParcelas: EditText? = null
+
+    private var calendar = Calendar.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +71,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
 
     private fun getLancamento(): Lancamento {
         val lancamento = Lancamento()
+        lancamento.titulo = this.etTitulo!!.text.toString()
         lancamento.descricao = this.etDescricao!!.text.toString()
         lancamento.valor = this.etValor!!.currencyDouble
         lancamento.data = this.etData!!.text.toString()
@@ -76,16 +84,35 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
      * Preenche os EditTexts da tela
      */
     private fun bindEditTexts(view: View) {
+        this.etTitulo = view.findViewById(R.id.et_lancamento_titulo)
         this.etDescricao = view.findViewById(R.id.et_lancamento_descricao)
         this.etValor = view.findViewById(R.id.et_lancamento_valor)
         this.etData = view.findViewById(R.id.et_lancamento_data)
         this.etQtParcelas = view.findViewById(R.id.et_lancamento_qt_parcelas)
+        val dpDialog = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            this.calendar.set(Calendar.YEAR, year)
+            this.calendar.set(Calendar.MONTH, monthOfYear)
+            this.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            this.updateEtData()
+        }
+        this.etData!!.setOnFocusChangeListener { _, _ ->
+            DatePickerDialog(
+                this.context!!,
+                dpDialog,
+                this.calendar.get(Calendar.YEAR),
+                this.calendar.get(Calendar.MONTH),
+                this.calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
     }
 
     /**
      * Inicializa os observers do viewmodel
      */
     private fun bindObservers() {
+        viewModel.titulo.observe(this, Observer {
+            this.etTitulo?.setText(it)
+        })
         viewModel.descricao.observe(this, Observer {
             this.etDescricao?.setText(it)
         })
@@ -100,4 +127,15 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         })
     }
 
+    /**
+     * Atualiza o valor do editText etData quando uma data for escolhida
+     * no DatePickerDialog
+     */
+    private fun updateEtData() {
+
+        val myFormat = "dd/MM/yyyy" //In which you need put here
+        val sdf = SimpleDateFormat(myFormat, Locale("pt", "BR"))
+
+        this.etData!!.setText(sdf.format(this.calendar.time))
+    }
 }
