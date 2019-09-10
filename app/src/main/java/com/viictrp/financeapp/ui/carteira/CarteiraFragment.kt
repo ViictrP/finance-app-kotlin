@@ -86,7 +86,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
 
     override fun onMonthChange(month: Int) {
         val mes = this.calendarView.getMonthDescription(month)
-        loadCarteira(mes!!)
+        this.loadCarteira(mes!!)
     }
 
     /**
