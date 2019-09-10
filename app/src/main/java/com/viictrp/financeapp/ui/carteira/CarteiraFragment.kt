@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.viictrp.financeapp.R
@@ -30,6 +31,7 @@ import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
+import com.viictrp.financeapp.utils.SwipeToDeleteCallback
 import io.realm.kotlin.where
 import java.util.*
 
@@ -101,20 +103,11 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
 
         carteiraViewModel.lancamentos.observe(this, Observer {
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
-            adapter.setList(it)
+            adapter.setList(it.toMutableList())
             adapter.notifyDataSetChanged()
         })
 
         carteiraViewModel.carteira.observe(this, Observer(System.out::println))
-    }
-
-    /**
-     * Inicializa os campos da tela
-     */
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
-    private fun init() {
-        val mes = this.calendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH))
-        loadCarteira(mes!!)
     }
 
     /**
@@ -129,6 +122,15 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         } else {
             criarNovaCarteira(mes)
         }
+    }
+
+    /**
+     * Inicializa os campos da tela
+     */
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    private fun init() {
+        val mes = this.calendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH))
+        loadCarteira(mes!!)
     }
 
     /**
@@ -238,8 +240,18 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private fun buildRecyclerView(root: View): RecyclerView {
         val context = this.activity!!.applicationContext
         val rvLancamentos: RecyclerView = root.findViewById(R.id.rv_lancamentos)
-        rvLancamentos.adapter = LancamentoAdapter(listOf(), context)
+        rvLancamentos.adapter = LancamentoAdapter(mutableListOf(), context)
         rvLancamentos.layoutManager = LinearLayoutManager(context)
+
+        val swipeHandler = object : SwipeToDeleteCallback(context) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                (rvLancamentos.adapter as LancamentoAdapter).removeAt(viewHolder.adapterPosition)
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(rvLancamentos)
+
         return rvLancamentos
     }
 

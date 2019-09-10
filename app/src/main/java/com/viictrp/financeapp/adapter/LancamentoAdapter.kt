@@ -10,12 +10,14 @@ import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Lancamento
 import kotlinx.android.synthetic.main.lancamento_recyclerview_item.view.*
 
-class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
-                        private val context: Context) : Adapter<LancamentoAdapter.LancamentoViewHolder>() {
+class LancamentoAdapter(
+    private var lancamentos: MutableList<Lancamento>?,
+    private val context: Context
+) : Adapter<LancamentoAdapter.LancamentoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LancamentoViewHolder {
         val view = LayoutInflater.from(context)
-                                 .inflate(R.layout.lancamento_recyclerview_item, parent, false)
+            .inflate(R.layout.lancamento_recyclerview_item, parent, false)
         return LancamentoViewHolder(view)
     }
 
@@ -23,12 +25,17 @@ class LancamentoAdapter(private var lancamentos: List<Lancamento>?,
         return lancamentos!!.size
     }
 
-    fun setList(lancamentos: List<Lancamento>) {
+    fun setList(lancamentos: MutableList<Lancamento>) {
         this.lancamentos = lancamentos
     }
 
     fun getList(): List<Lancamento>? {
         return this.lancamentos
+    }
+
+    fun removeAt(position: Int) {
+        this.lancamentos?.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     override fun onBindViewHolder(holder: LancamentoViewHolder, position: Int) {
