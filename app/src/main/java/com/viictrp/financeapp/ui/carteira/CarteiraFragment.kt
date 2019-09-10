@@ -20,18 +20,23 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.repository.CarteiraRepository
+import com.viictrp.financeapp.repository.LancamentoRepository
+import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
+import io.realm.kotlin.deleteFromRealm
 import io.realm.kotlin.where
 import java.util.*
 
@@ -44,6 +49,10 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private lateinit var rvLancamentos: RecyclerView
     private lateinit var pbOrcamento: ProgressBar
     private lateinit var calendarView: CustomCalendarView
+
+    private lateinit var lancamentoRepository: LancamentoRepository
+    private lateinit var carteiraRepository: CarteiraRepository
+    private lateinit var orcamentoRepository: OrcamentoRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -114,8 +123,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * Busca a carteira do mês
      */
     private fun loadCarteira(mes: String) {
-        val realm = RealmInitializer.getInstance(this.context!!)
-        val carteira = realm.where<Carteira>().equalTo(Constantes.mes, mes).findFirst()
+        val carteira = this.carteiraRepository.findCarteiraByMes(mes)
         if (carteira != null) {
             loadOrcamento(carteira)
             carteiraViewModel.carteira.postValue(carteira)
@@ -130,6 +138,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun init() {
         val mes = this.calendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH))
+        this.lancamentoRepository = LancamentoRepository(this.context!!)
+        this.carteiraRepository = CarteiraRepository(this.context!!)
+        this.orcamentoRepository = OrcamentoRepository(this.context!!)
         loadCarteira(mes!!)
     }
 
@@ -139,10 +150,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * @param carteiraId Id da carteiraLong
      */
     private fun loadLancamentos(carteiraId: Long, valorOrcamento: Double) {
-        val realm = RealmInitializer.getInstance(this.context!!)
-        val lancamentos = realm.where<Lancamento>()
-            .equalTo(Constantes.carteiraId, carteiraId)
-            .findAll()
+        val lancamentos = lancamentoRepository.findLancamentosByCarteiraId(carteiraId)
 
         calcularValorTotalGasto(lancamentos, valorOrcamento)
         carteiraViewModel.lancamentos.postValue(lancamentos)
@@ -188,9 +196,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * @param carteira carteira
      */
     private fun loadOrcamento(carteira: Carteira) {
-        val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
-        val orcamento =
-            realm.where<Orcamento>().equalTo(Constantes.carteiraId, carteira.id).findFirst()
+        val orcamento = orcamentoRepository.findOrcamentoByCarteiraId(carteira.id!!)
         if (orcamento == null) {
             criarNovoOrcamento(carteira.id, carteira.mes)
         } else {
@@ -245,7 +251,11 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
 
         val swipeHandler = object : SwipeToDeleteCallback(context) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                (rvLancamentos.adapter as LancamentoAdapter).removeAt(viewHolder.adapterPosition)
+                val position = viewHolder.adapterPosition
+                val adapter = (rvLancamentos.adapter as LancamentoAdapter)
+                val lancamento = adapter.getList()!![position]
+                deleteLancamento(lancamento)
+                adapter.removeAt(position)
             }
         }
 
@@ -253,6 +263,21 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         itemTouchHelper.attachToRecyclerView(rvLancamentos)
 
         return rvLancamentos
+    }
+
+    fun deleteLancamento(lancamento: Lancamento) {
+        val realm = RealmInitializer.getInstance(this.context!!)
+        realm.executeTransaction {
+            it.where<Lancamento>()
+                .equalTo(Constantes.id, lancamento.id)
+                .findFirst()
+                ?.deleteFromRealm()
+        }
+        Snackbar.make(
+            this.view!!,
+            "Lançamento excluído com sucesso.",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
 }

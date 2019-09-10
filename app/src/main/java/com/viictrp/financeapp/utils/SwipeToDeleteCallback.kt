@@ -11,7 +11,7 @@ import com.viictrp.financeapp.R
 abstract class SwipeToDeleteCallback(context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_align_to_left_24)
+    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_trash_solid_24_white)
     private val intrinsicWidth = deleteIcon!!.intrinsicWidth
     private val intrinsicHeight = deleteIcon!!.intrinsicHeight
     private val background = ColorDrawable()
