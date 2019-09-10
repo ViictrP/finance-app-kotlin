@@ -26,7 +26,6 @@ import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.model.Orcamento
-import com.viictrp.financeapp.realm.RealmInitializer
 import com.viictrp.financeapp.repository.CarteiraRepository
 import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.repository.OrcamentoRepository
@@ -36,8 +35,6 @@ import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
-import io.realm.kotlin.deleteFromRealm
-import io.realm.kotlin.where
 import java.util.*
 
 class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
@@ -137,7 +134,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun init() {
-        val mes = this.calendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH))
+        val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
+        this.calendarView.setMonth(monthId)
+        val mes = this.calendarView.getMonthDescription(monthId)
         this.lancamentoRepository = LancamentoRepository(this.context!!)
         this.carteiraRepository = CarteiraRepository(this.context!!)
         this.orcamentoRepository = OrcamentoRepository(this.context!!)
@@ -209,16 +208,12 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * Cria um novo orçamento caso não exista na carteira
      */
     private fun criarNovoOrcamento(carteiraId: Long?, mes: String?) {
-        val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
-        realm.executeTransactionAsync {
-            val lastId = it.where<Orcamento>().max(Constantes.id)
-            val orcamento = Orcamento(0.0, mes)
-            orcamento.carteiraId = carteiraId
-            if (lastId != null) orcamento.id = lastId.toLong() + 1 else orcamento.id = 1
-            it.insert(orcamento)
-            this.activity!!.runOnUiThread(Runnable {
-                carteiraViewModel.orcamento.postValue(orcamento)
-            })
+        val orcamento = Orcamento(0.0, mes)
+        orcamento.carteiraId = carteiraId
+        orcamentoRepository.save(orcamento) {
+            this.activity!!.runOnUiThread {
+                carteiraViewModel.orcamento.postValue(it)
+            }
         }
     }
 
@@ -226,17 +221,14 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * Cria uma nova carteira caso não exista carteiras para o mês atual
      */
     private fun criarNovaCarteira(mes: String) {
-        val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
-        realm.executeTransactionAsync {
-            val newCarteira = Carteira(mes)
-            val lastId = it.where<Carteira>().max(Constantes.id)
-            if (lastId != null) newCarteira.id = lastId.toLong() + 1 else newCarteira.id = 1
-            newCarteira.usuarioId = 1
-            it.insert(newCarteira)
-            criarNovoOrcamento(newCarteira.id, newCarteira.mes)
-            this.activity!!.runOnUiThread(Runnable {
-                carteiraViewModel.carteira.postValue(newCarteira)
-            })
+        val carteira = Carteira(mes).apply {
+            this.usuarioId = 1
+        }
+        carteiraRepository.save(carteira) {
+            criarNovoOrcamento(carteira.id, carteira.mes)
+            this.activity!!.runOnUiThread {
+                carteiraViewModel.carteira.postValue(it)
+            }
         }
     }
 
@@ -266,13 +258,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     }
 
     fun deleteLancamento(lancamento: Lancamento) {
-        val realm = RealmInitializer.getInstance(this.context!!)
-        realm.executeTransaction {
-            it.where<Lancamento>()
-                .equalTo(Constantes.id, lancamento.id)
-                .findFirst()
-                ?.deleteFromRealm()
-        }
+        lancamentoRepository.delete(lancamento)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",

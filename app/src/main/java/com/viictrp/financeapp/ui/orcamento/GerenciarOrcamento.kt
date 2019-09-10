@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.utils.Constantes
 import io.realm.kotlin.where
@@ -22,6 +23,7 @@ import io.realm.kotlin.where
 class GerenciarOrcamento : Fragment(), OnClickListener {
 
     private lateinit var viewModel: GerenciarOrcamentoViewModel
+    private lateinit var orcamentoRepository: OrcamentoRepository
     private var currencyEditText: CurrencyEditText? = null
     private var navController: NavController? = null
 
@@ -39,6 +41,7 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
         navController = view.findNavController()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
         currencyEditText = view.findViewById(R.id.orcamentoInput)
+        this.orcamentoRepository = OrcamentoRepository(this.context!!)
         viewModel.valor.observe(this, Observer {
             currencyEditText!!.setText("$it")
         })
@@ -62,10 +65,9 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
      * Busca o orçamento no realm
      */
     private fun loadOrcamento() {
-        val realm = RealmInitializer.getInstance(this.context!!)
         val orcamentoId = arguments?.getLong(Constantes.orcamentoIdKey)
         viewModel.orcamentoId.postValue(orcamentoId)
-        val orcamento = realm.where<Orcamento>().equalTo(Constantes.id, orcamentoId).findFirst()
+        val orcamento = orcamentoRepository.findById(orcamentoId!!)
         viewModel.valor.postValue(orcamento?.valor)
     }
 

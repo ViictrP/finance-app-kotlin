@@ -14,16 +14,19 @@ class OrcamentoRepository(private val context: Context) {
             .findFirst()
     }
 
-    fun save(orcamento: Orcamento, finish: () -> Orcamento?) {
-        // TODO implementar
-//        val realm = RealmInitializer.getInstance(this.context)
-//        realm.executeTransactionAsync {
-//            val lastId = it.where<Orcamento>().max(Constantes.id)
-//            if (lastId != null) orcamento.id = lastId.toLong() + 1 else orcamento.id = 1
-//            it.insert(orcamento)
-//            this.context.runOnUiThread(Runnable {
-//                carteiraViewModel.orcamento.postValue(orcamento)
-//            })
-//        }
+    fun findById(orcamentoId: Long): Orcamento? {
+        val realm = RealmInitializer.getInstance(this.context)
+        return realm.where<Orcamento>().equalTo(Constantes.id, orcamentoId)
+            .findFirst()
+    }
+
+    fun save(orcamento: Orcamento, finish: (orcamento: Orcamento?) -> Unit) {
+        val realm = RealmInitializer.getInstance(this.context)
+        realm.executeTransactionAsync {
+            val lastId = it.where<Orcamento>().max(Constantes.id)
+            if (lastId != null) orcamento.id = lastId.toLong() + 1 else orcamento.id = 1
+            it.insert(orcamento)
+            finish(orcamento)
+        }
     }
 }

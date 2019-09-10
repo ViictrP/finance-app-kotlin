@@ -17,15 +17,14 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.transition.TransitionInflater
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Orcamento
-import com.viictrp.financeapp.realm.RealmInitializer
-import com.viictrp.financeapp.ui.transitions.TextSizeTransition
+import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
-import io.realm.kotlin.where
 
 class OrcamentoFragment : Fragment(), OnClickListener {
 
     private lateinit var viewModel: OrcamentoViewModel
+    private lateinit var orcamentoRepository: OrcamentoRepository
     private var navController: NavController? = null
 
     override fun onCreateView(
@@ -44,10 +43,14 @@ class OrcamentoFragment : Fragment(), OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
+        this.orcamentoRepository = OrcamentoRepository(this.context!!)
         buildObservers(view)
+        init()
+    }
+
+    private fun init() {
         val orcamentoId = arguments?.getLong(Constantes.orcamentoIdKey)
-        val realm = RealmInitializer.getInstance(this.activity!!.applicationContext)
-        val orcamento = realm.where<Orcamento>().equalTo(Constantes.id, orcamentoId).findFirst()
+        val orcamento = orcamentoRepository.findById(orcamentoId!!)
         viewModel.orcamento.postValue(orcamento)
     }
 

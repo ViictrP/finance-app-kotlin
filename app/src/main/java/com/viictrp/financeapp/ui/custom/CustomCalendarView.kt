@@ -101,6 +101,15 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
     }
 
     /**
+     * Seta o mês
+     */
+    fun setMonth(month: Int) {
+        val textView = root.findViewById<TextView>(R.id.custom_calendar_tx_month)
+        textView.text = months[month]
+        this.month = month
+    }
+
+    /**
      * OnClick dos botões
      */
     override fun onClick(button: View?) {

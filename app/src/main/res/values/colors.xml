@@ -13,5 +13,5 @@
     <color name="labelTintColorAccent">#666</color>
     <color name="warningTintColor">#f57c00</color>
     <color name="dangerTintColor">#c30000</color>
-    <color name="splashscreen_bg">#19551C</color>
+    <color name="splashscreen_bg">#FFF</color>
 </resources>

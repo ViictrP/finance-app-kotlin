@@ -15,10 +15,9 @@ import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Lancamento
-import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.utils.Constantes
-import io.realm.kotlin.where
 import java.util.*
 import java.text.SimpleDateFormat
 
@@ -36,6 +35,8 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private var etData: EditText? = null
     private var etQtParcelas: EditText? = null
 
+    private lateinit var lancamentoRepository: LancamentoRepository
+
     private var calendar = Calendar.getInstance()
 
     override fun onCreateView(
@@ -49,6 +50,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         this.navController = view.findNavController()
         viewModel = ViewModelProviders.of(this).get(LancamentoViewModel::class.java)
+        this.lancamentoRepository = LancamentoRepository(this.context!!)
         bindEditTexts(view)
         bindObservers()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
@@ -56,16 +58,12 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        val realm = RealmInitializer.getInstance(this.context!!)
-        realm.executeTransaction {
-            val lastId = it.where<Lancamento>().max(Constantes.id)
-            val lancamento = getLancamento()
-            if (lastId != null) lancamento.id = lastId.toLong() + 1 else lancamento.id = 1
-            it.insert(lancamento)
+        val lancamento = getLancamento()
+        lancamentoRepository.save(lancamento) {
+            Snackbar.make(this.view!!, "Lançamento criado com sucesso.", Snackbar.LENGTH_SHORT)
+                .show()
+            navController?.navigateUp()
         }
-        Snackbar.make(this.view!!, "Lançamento criado com sucesso.", Snackbar.LENGTH_SHORT)
-            .show()
-        navController?.navigateUp()
     }
 
     private fun getLancamento(): Lancamento {
