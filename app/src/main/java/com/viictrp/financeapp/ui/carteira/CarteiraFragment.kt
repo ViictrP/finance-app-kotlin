@@ -113,6 +113,10 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             adapter.notifyDataSetChanged()
         })
 
+        carteiraViewModel.progressBarProgress.observe(this, Observer {
+            pbOrcamento.progress = it
+        })
+
         carteiraViewModel.carteira.observe(this, Observer(System.out::println))
     }
 
@@ -184,9 +188,10 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * @param valorTotalOrcamento - valor total do orçamento do mês
      */
     private fun calcularPorcentagemProgressBar(valorTotal: Double, valorTotalOrcamento: Double) {
-        this.pbOrcamento.progress =
+        val progress =
             if (valorTotal >= valorTotalOrcamento) 100
             else ((valorTotal / valorTotalOrcamento) * 100).toInt()
+        this.carteiraViewModel.progressBarProgress.postValue(progress)
     }
 
     /**
@@ -248,6 +253,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
                 val lancamento = adapter.getList()!![position]
                 deleteLancamento(lancamento)
                 adapter.removeAt(position)
+                calcularValorTotalGasto(adapter.getList(), carteiraViewModel.orcamento.value!!.valor!!)
             }
         }
 

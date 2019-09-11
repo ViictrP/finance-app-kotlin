@@ -9,15 +9,8 @@ import java.util.*
 
 class CarteiraViewModel : ViewModel() {
 
-    private val _carteira = MutableLiveData<Carteira>().apply {
-        value = Carteira(Calendar.AUGUST.toString())
-    }
-
-    private val _orcamento = MutableLiveData<Orcamento>().apply {
-        value = Orcamento(0.0, Calendar.AUGUST.toString())
-    }
-
     val lancamentos: MutableLiveData<List<Lancamento>> = MutableLiveData()
-    val carteira: MutableLiveData<Carteira> = _carteira
-    val orcamento: MutableLiveData<Orcamento> = _orcamento
+    val carteira: MutableLiveData<Carteira> = MutableLiveData()
+    val orcamento: MutableLiveData<Orcamento> = MutableLiveData()
+    val progressBarProgress: MutableLiveData<Int> = MutableLiveData()
 }
