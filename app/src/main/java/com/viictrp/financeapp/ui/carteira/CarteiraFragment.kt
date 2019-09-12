@@ -241,7 +241,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * Construindo a RecyclerView para listar os lançamentos
      */
     private fun buildRecyclerView(root: View): RecyclerView {
-        val context = this.activity!!.applicationContext
+        val context = this.context!!
         val rvLancamentos: RecyclerView = root.findViewById(R.id.rv_lancamentos)
         rvLancamentos.adapter = LancamentoAdapter(mutableListOf(), context)
         rvLancamentos.layoutManager = LinearLayoutManager(context)
