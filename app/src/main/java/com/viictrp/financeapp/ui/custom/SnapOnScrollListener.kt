@@ -1,11 +1,13 @@
 package com.viictrp.financeapp.ui.custom
+
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
+import com.viictrp.financeapp.ui.custom.CarouselRecyclerView.OnItemChangedListener
 
 class SnapOnScrollListener(
     private val snapHelper: SnapHelper,
-    var behavior: Behavior = Behavior.NOTIFY_ON_SCROLL,
-    var onSnapPositionChangeListener: OnSnapPositionChangeListener? = null
+    private var behavior: Behavior = Behavior.NOTIFY_ON_SCROLL,
+    private var onItemChangedChangeListener: OnItemChangedListener? = null
 ) : RecyclerView.OnScrollListener() {
 
     enum class Behavior {
@@ -32,7 +34,7 @@ class SnapOnScrollListener(
         val snapPosition = snapHelper.getSnapPosition(recyclerView)
         val snapPositionChanged = this.snapPosition != snapPosition
         if (snapPositionChanged) {
-            onSnapPositionChangeListener.onSnapPositionChange(snapPosition)
+            onItemChangedChangeListener?.onItemChangedListener(snapPosition)
             this.snapPosition = snapPosition
         }
     }

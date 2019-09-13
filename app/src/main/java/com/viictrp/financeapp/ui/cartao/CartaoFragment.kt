@@ -73,8 +73,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     private fun initChildren(root: View) {
         this.crCartoes = root.findViewById(R.id.cr_cartoes)
-        this.crCartoes.initialize(CartaoAdapter(mutableListOf(), this.context!!))
-        this.crCartoes.setOnItemChangedListener(this)
+        this.crCartoes.initialize(CartaoAdapter(mutableListOf(), this.context!!), this)
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
         this.calendarView.setOnMonthChangeListener(this)
         this.rvLancamentos = root.findViewById(R.id.rv_lancamentos_cartoes)

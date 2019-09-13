@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.ArgbEvaluator
 import com.viictrp.financeapp.R
+import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.Behavior
 import kotlin.math.pow
 
 class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView(context, attrs) {
@@ -21,18 +22,22 @@ class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView
     private lateinit var mItemChangedListener: OnItemChangedListener
     private lateinit var mSnapHelper: LinearSnapHelper
 
-    private var snapPosition = NO_POSITION
-
     private val activeColor
             by lazy { ContextCompat.getColor(context, R.color.white) }
     private val inactiveColor
             by lazy { ContextCompat.getColor(context, R.color.labelTintColor) }
     private var viewsToChangeColor = listOf<Int>()
 
-    fun <T : ViewHolder> initialize(newAdapter: Adapter<T>) {
+    fun <T : ViewHolder> initialize(newAdapter: Adapter<T>, listener: OnItemChangedListener) {
+        this.mItemChangedListener = listener
         layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
         this.mSnapHelper = LinearSnapHelper()
         this.mSnapHelper.attachToRecyclerView(this)
+        val snapOnScrollListener = SnapOnScrollListener(
+            this.mSnapHelper,
+            Behavior.NOTIFY_ON_SCROLL_STATE_IDLE,
+            this.mItemChangedListener
+        )
         newAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 post {
@@ -41,28 +46,12 @@ class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView
                         setPadding(sidePadding, 0, sidePadding, 0)
                         scrollToPosition(0)
                         // onScrollChanged()
-                        addOnScrollListener(object : OnScrollListener() {
-                            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                                super.onScrolled(recyclerView, dx, dy)
-                                // onScrollChanged()
-                                maybeNotifySnapPositionChange(recyclerView)
-                            }
-                        })
+                        addOnScrollListener(snapOnScrollListener)
                     }
                 }
             }
         })
         adapter = newAdapter
-    }
-
-    private fun maybeNotifySnapPositionChange(recyclerView: RecyclerView) {
-        val snapPosition = this.mSnapHelper.getSnapPosition(recyclerView)
-        val snapPositionChanged = this.snapPosition != snapPosition
-        if (snapPositionChanged) {
-            this.mItemChangedListener
-                .onItemChangedListener(snapPosition)
-            this.snapPosition = snapPosition
-        }
     }
 
     private fun onScrollChanged() {
@@ -80,10 +69,6 @@ class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView
 
     fun setViewsToChangeColor(viewIds: List<Int>) {
         viewsToChangeColor = viewIds
-    }
-
-    fun setOnItemChangedListener(listener: OnItemChangedListener) {
-        this.mItemChangedListener = listener
     }
 
     @SuppressLint("RestrictedApi")
