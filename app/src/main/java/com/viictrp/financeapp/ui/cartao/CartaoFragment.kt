@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
@@ -20,17 +21,18 @@ import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.FaturaRepository
 import com.viictrp.financeapp.repository.LancamentoRepository
-import com.viictrp.financeapp.ui.custom.CarouselRecyclerView
-import com.viictrp.financeapp.ui.custom.CarouselRecyclerView.OnItemChangedListener
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
+import com.viictrp.financeapp.ui.custom.LinePagerIndicatorDecoration
+import com.viictrp.financeapp.ui.custom.SnapOnScrollListener
+import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
 
 class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnItemChangedListener {
 
     private lateinit var cartaoViewModel: CartaoViewModel
-    private lateinit var crCartoes: CarouselRecyclerView
+    private lateinit var crCartoes: RecyclerView
     private lateinit var calendarView: CustomCalendarView
     private lateinit var rvLancamentos: RecyclerView
 
@@ -73,7 +75,17 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     private fun initChildren(root: View) {
         this.crCartoes = root.findViewById(R.id.cr_cartoes)
-        this.crCartoes.initialize(CartaoAdapter(mutableListOf(), this.context!!), this)
+        this.crCartoes.adapter = CartaoAdapter(mutableListOf(), this.context!!)
+        this.crCartoes.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        val mSnapHelper = LinearSnapHelper()
+        mSnapHelper.attachToRecyclerView(this.crCartoes)
+        val snapOnScrollListener = SnapOnScrollListener(
+            mSnapHelper,
+            SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE,
+            this
+        )
+        this.crCartoes.addOnScrollListener(snapOnScrollListener)
+        this.crCartoes.addItemDecoration(LinePagerIndicatorDecoration())
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
         this.calendarView.setOnMonthChangeListener(this)
         this.rvLancamentos = root.findViewById(R.id.rv_lancamentos_cartoes)
