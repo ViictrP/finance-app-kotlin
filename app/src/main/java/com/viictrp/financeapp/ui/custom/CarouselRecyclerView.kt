@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.ArgbEvaluator
 import com.viictrp.financeapp.R
 import kotlin.math.pow
+import androidx.recyclerview.widget.PagerSnapHelper
 
 class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView(context, attrs) {
 
@@ -25,12 +26,14 @@ class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView
 
     fun <T : ViewHolder> initialize(newAdapter: Adapter<T>) {
         layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
+        PagerSnapHelper().attachToRecyclerView(this)
         newAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 post {
                     val sidePadding = (width / 2) - (getChildAt(0).width / 2)
                     setPadding(sidePadding, 0, sidePadding, 0)
                     scrollToPosition(0)
+                    onScrollChanged()
                     addOnScrollListener(object : OnScrollListener() {
                         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                             super.onScrolled(recyclerView, dx, dy)
@@ -48,9 +51,9 @@ class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView
             (0 until childCount).forEach { position ->
                 val child = getChildAt(position)
                 val childCenterX = (child.left + child.right) / 2
-                val scaleValue = getGaussianScale(childCenterX)
-                child.scaleX = scaleValue
-                child.scaleY = scaleValue
+                val scaleValue = getGaussianScale(childCenterX, 1f, 1f, 150.toDouble())
+//                child.scaleX = scaleValue
+//                child.scaleY = scaleValue
                 colorView(child, scaleValue)
             }
         }
@@ -85,12 +88,15 @@ class CarouselRecyclerView(context: Context, attrs: AttributeSet) : RecyclerView
         }
     }
 
-    private fun getGaussianScale(childCenterX: Int): Float {
+    private fun getGaussianScale(
+        childCenterX: Int,
+        minScaleOffest: Float,
+        scaleFactor: Float,
+        spreadFactor: Double
+    ): Float {
         val recyclerCenterX = (left + right) / 2
         return (Math.E.pow(
-            -(childCenterX - recyclerCenterX.toDouble()).pow(2.toDouble()) / (2 * 150.toDouble().pow(
-                2.toDouble()
-            ))
-        ) * 1f + 1f).toFloat()
+            -(childCenterX - recyclerCenterX.toDouble()).pow(2.toDouble()) / (2 * spreadFactor.pow(2.toDouble()))
+        ) * scaleFactor + minScaleOffest).toFloat()
     }
 }

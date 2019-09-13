@@ -22,6 +22,11 @@
     <string name="novo_lancamento_subtitle">Adicionar novo lançamento.</string>
     <string name="preencha_tudo">Por favor preencha todos os campos.</string>
     <string name="app_img_content_description">Logomarca do aplicativo.</string>
+    <string name="balanco">balanço</string>
+    <string name="numero_cartao">1234</string>
+    <string name="bandeira_placeholder">VISA</string>
+    <string name="fechamento">fechamento</string>
+    <string name="fechamento_dia">17/07</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
