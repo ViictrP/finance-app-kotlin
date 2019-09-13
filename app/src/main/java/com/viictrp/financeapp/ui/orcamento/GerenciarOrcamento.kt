@@ -52,7 +52,7 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
         val realm = RealmInitializer.getInstance(this.context!!)
         realm.executeTransactionAsync {
             val orcamento = it.where<Orcamento>()
-                .equalTo(Constantes.id, viewModel.orcamentoId.value)
+                .equalTo(Constantes.ID, viewModel.orcamentoId.value)
                 .findFirst()
             orcamento!!.valor = currencyEditText!!.currencyDouble
         }
@@ -65,7 +65,7 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
      * Busca o orçamento no realm
      */
     private fun loadOrcamento() {
-        val orcamentoId = arguments?.getLong(Constantes.orcamentoIdKey)
+        val orcamentoId = arguments?.getLong(Constantes.ORCAMENTO_ID_KEY)
         viewModel.orcamentoId.postValue(orcamentoId)
         val orcamento = orcamentoRepository.findById(orcamentoId!!)
         viewModel.valor.postValue(orcamento?.valor)

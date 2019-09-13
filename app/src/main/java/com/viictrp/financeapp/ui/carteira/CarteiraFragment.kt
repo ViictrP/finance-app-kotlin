@@ -67,7 +67,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         this.pbOrcamento = view.findViewById(R.id.pb_orcamento)
         this.txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
         this.txGastoAteMomento = view.findViewById(R.id.tx_gasto_ate_momento)
-        this.calendarView = view.findViewById(R.id.calendarView)
+        this.calendarView = view.findViewById(R.id.calendarView_carteira)
         this.calendarView.setOnMonthChangeListener(this)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
         view.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
@@ -79,7 +79,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         when (view!!.id) {
             R.id.btn_orcamento -> navController!!.navigate(
                 R.id.action_navegacao_carteira_to_navegacao_orcamento,
-                bundleOf(Constantes.orcamentoIdKey to carteiraViewModel.orcamento.value?.id),
+                bundleOf(Constantes.ORCAMENTO_ID_KEY to carteiraViewModel.orcamento.value?.id),
                 null,
                 FragmentNavigatorExtras(
                     txValorOrcamento to "orcamento_value"
@@ -87,7 +87,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             )
             R.id.btn_novo_lancamento -> navController!!.navigate(
                 R.id.action_navegacao_carteira_to_lancamentoFragment,
-                bundleOf(Constantes.carteiraIdKey to carteiraViewModel.carteira.value?.id)
+                bundleOf(Constantes.CARTEIRA_ID_KEY to carteiraViewModel.carteira.value?.id)
             )
         }
     }

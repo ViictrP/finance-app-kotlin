@@ -54,7 +54,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         bindEditTexts(view)
         bindObservers()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
-        viewModel.carteiraId.postValue(arguments?.getLong(Constantes.carteiraIdKey))
+        viewModel.carteiraId.postValue(arguments?.getLong(Constantes.CARTEIRA_ID_KEY))
     }
 
     override fun onClick(view: View?) {

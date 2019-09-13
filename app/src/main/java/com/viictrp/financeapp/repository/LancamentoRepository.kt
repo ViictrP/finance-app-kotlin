@@ -12,7 +12,7 @@ class LancamentoRepository(private val context: Context) {
     fun findLancamentosByCarteiraId(carteiraId: Long): List<Lancamento> {
         val realm = RealmInitializer.getInstance(this.context)
         return realm.where<Lancamento>()
-            .equalTo(Constantes.carteiraId, carteiraId)
+            .equalTo(Constantes.CARTEIRA_ID, carteiraId)
             .findAll()
             .toList()
     }
@@ -20,7 +20,7 @@ class LancamentoRepository(private val context: Context) {
     fun save(lancamento: Lancamento, finish: (lancamento: Lancamento?) -> Unit) {
         val realm = RealmInitializer.getInstance(this.context)
         realm.executeTransaction {
-            val lastId = it.where<Lancamento>().max(Constantes.id)
+            val lastId = it.where<Lancamento>().max(Constantes.ID)
             if (lastId != null) lancamento.id = lastId.toLong() + 1 else lancamento.id = 1
             it.insert(lancamento)
             finish(lancamento)
@@ -31,7 +31,7 @@ class LancamentoRepository(private val context: Context) {
         val realm = RealmInitializer.getInstance(this.context)
         realm.executeTransaction {
             it.where<Lancamento>()
-                .equalTo(Constantes.id, lancamento.id)
+                .equalTo(Constantes.ID, lancamento.id)
                 .findFirst()
                 ?.deleteFromRealm()
         }

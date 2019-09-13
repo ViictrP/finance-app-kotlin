@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<androidx.core.widget.NestedScrollView xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/carteira_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,7 +20,7 @@
             android:background="@color/white">
 
             <com.viictrp.financeapp.ui.custom.CustomCalendarView
-                android:id="@+id/calendarView"
+                android:id="@+id/calendarView_carteira"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -41,7 +41,7 @@
                 android:transitionName="orcamento_value"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/calendarView" />
+                app:layout_constraintTop_toBottomOf="@+id/calendarView_carteira" />
 
             <TextView
                 android:id="@+id/tx_descricao"
@@ -97,6 +97,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tx_descricao" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Valor disponível até o momento"
+                android:textAlignment="center"
+                android:textColor="@color/labelTintColor"
+                android:textSize="12sp"
+                android:layout_marginTop="17dp"
+                app:layout_constraintStart_toStartOf="@+id/pb_orcamento"
+                app:layout_constraintTop_toBottomOf="@+id/pb_orcamento" />
+
+            <com.viictrp.financeapp.ui.custom.RialTextView
+                android:id="@+id/tx_valor_disponivel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/money_placeholder"
+                android:textAlignment="center"
+                android:textColor="@color/labelTintColor"
+                android:textSize="15sp"
+                android:layout_marginTop="17dp"
+                app:layout_constraintEnd_toEndOf="@+id/pb_orcamento"
+                app:layout_constraintTop_toBottomOf="@+id/pb_orcamento" />
+
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/action_buttons_container"
                 android:layout_width="match_parent"
@@ -150,7 +175,7 @@
         <View
             android:id="@+id/vw_bottom_padding"
             android:layout_width="match_parent"
-            android:layout_height="100dp" />
+            android:layout_height="50dp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

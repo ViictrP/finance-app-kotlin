@@ -14,4 +14,5 @@ open class Cartao(descricao: String? = null,
     var descricao: String? = descricao
     var dataFechamento: Long? = dataFechamento
     var limite: Double? = limite
+    var usuarioId: Long? = null
 }

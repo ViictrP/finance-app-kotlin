@@ -16,7 +16,6 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.transition.TransitionInflater
 import com.viictrp.financeapp.R
-import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
@@ -49,7 +48,7 @@ class OrcamentoFragment : Fragment(), OnClickListener {
     }
 
     private fun init() {
-        val orcamentoId = arguments?.getLong(Constantes.orcamentoIdKey)
+        val orcamentoId = arguments?.getLong(Constantes.ORCAMENTO_ID_KEY)
         val orcamento = orcamentoRepository.findById(orcamentoId!!)
         viewModel.orcamento.postValue(orcamento)
     }
@@ -57,7 +56,7 @@ class OrcamentoFragment : Fragment(), OnClickListener {
     override fun onClick(cardView: View?) {
         navController!!.navigate(
             R.id.action_navegacao_orcamento_to_gerenciarOrcamento,
-            bundleOf(Constantes.orcamentoIdKey to viewModel.orcamento.value?.id),
+            bundleOf(Constantes.ORCAMENTO_ID_KEY to viewModel.orcamento.value?.id),
             null,
             FragmentNavigatorExtras(
                 this.view!!.findViewById<TextView>(R.id.cv_manage_orcamento) to "btn_salvar"

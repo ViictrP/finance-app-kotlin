@@ -1,15 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:scrollbars="none">
 
-    <com.viictrp.financeapp.ui.custom.CarouselRecyclerView
-        android:id="@+id/cr_cartoes"
+    <LinearLayout
+        android:id="@+id/cartoes_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:overScrollMode="never"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@color/white">
+
+            <com.viictrp.financeapp.ui.custom.CarouselRecyclerView
+                android:id="@+id/cr_cartoes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.viictrp.financeapp.ui.custom.CustomCalendarView
+                android:id="@+id/calendarView_cartoes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/action_buttons_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/action_buttons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <Button
+                    android:id="@+id/btn_novo_lancamento"
+                    style="?android:attr/selectableItemBackgroundBorderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple"
+                    android:drawableTop="@drawable/ic_shopping_bag_solid_24"
+                    android:paddingTop="20dp"
+                    android:text="@string/title_lanc_carteira"
+                    android:textAlignment="center"
+                    android:textColor="@color/labelTintColorAccent"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btn_pagar_cartao"
+                    style="?android:attr/selectableItemBackgroundBorderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple"
+                    android:drawableTop="@drawable/ic_payment_method_24"
+                    android:paddingTop="20dp"
+                    android:text="@string/title_cartao_pagar"
+                    android:textAlignment="center"
+                    android:textColor="@color/labelTintColorAccent"
+                    android:textSize="13sp"
+                    android:transitionName="btn_orcamento" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_lancamentos_cartoes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/list_background"
+            android:nestedScrollingEnabled="false"
+            android:paddingTop="40dp"/>
+
+        <View
+            android:id="@+id/vw_bottom_padding"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
