@@ -11,10 +11,22 @@ class LancamentoRepository(private val context: Context) {
 
     fun findLancamentosByCarteiraId(carteiraId: Long): List<Lancamento> {
         val realm = RealmInitializer.getInstance(this.context)
-        return realm.where<Lancamento>()
-            .equalTo(Constantes.CARTEIRA_ID, carteiraId)
-            .findAll()
-            .toList()
+        return realm.copyFromRealm(
+            realm.where<Lancamento>()
+                .equalTo(Constantes.CARTEIRA_ID, carteiraId)
+                .findAll()
+                .toList()
+        )
+    }
+
+    fun findLancamentosByFaturaId(faturaId: Long): List<Lancamento> {
+        val realm = RealmInitializer.getInstance(this.context)
+        return realm.copyFromRealm(
+            realm.where<Lancamento>()
+                .equalTo(Constantes.FATURA_ID, faturaId)
+                .findAll()
+                .toList()
+        )
     }
 
     fun save(lancamento: Lancamento, finish: (lancamento: Lancamento?) -> Unit) {

@@ -15,9 +15,13 @@ import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
+import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.model.Lancamento
+import com.viictrp.financeapp.repository.CarteiraRepository
+import com.viictrp.financeapp.repository.FaturaRepository
 import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
+import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import java.util.*
 import java.text.SimpleDateFormat
@@ -37,6 +41,8 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private var etQtParcelas: EditText? = null
 
     private lateinit var lancamentoRepository: LancamentoRepository
+    private lateinit var carteiraRepository: CarteiraRepository
+    private lateinit var faturaRepository: FaturaRepository
 
     private var calendar = Calendar.getInstance()
 
@@ -53,18 +59,69 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         this.navController = view.findNavController()
         viewModel = ViewModelProviders.of(this).get(LancamentoViewModel::class.java)
         this.lancamentoRepository = LancamentoRepository(this.context!!)
+        this.carteiraRepository = CarteiraRepository(this.context!!)
+        this.faturaRepository = FaturaRepository(this.context!!)
         bindEditTexts(view)
         bindObservers()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
         viewModel.carteiraId.postValue(arguments?.getLong(Constantes.CARTEIRA_ID_KEY))
+        viewModel.faturaId.postValue(arguments?.getLong(Constantes.CARTAO_ID_KEY))
     }
 
     override fun onClick(view: View?) {
         val lancamento = getLancamento()
+        validarCarteiraOuFatura(lancamento)
         lancamentoRepository.save(lancamento) {
             Snackbar.make(this.view!!, "Lançamento criado com sucesso.", Snackbar.LENGTH_SHORT)
                 .show()
             navController?.navigateUp()
+        }
+    }
+
+    private fun validarCarteiraOuFatura(lancamento: Lancamento) {
+        validarCarteira(lancamento)
+        validarFatura(lancamento)
+    }
+
+    private fun validarFatura(lancamento: Lancamento) {
+        viewModel.faturaId.value.let {
+            if (it != null && it != Constantes.ZERO_LONG) {
+                val fatura = faturaRepository.findById(it)
+                if (fatura != null) {
+                    val diaLancamento = lancamento.data!!.split("/")[Constantes.ZERO]
+                    if (fatura.diaFechamento!! < diaLancamento.toLong()) {
+                        lancamento.faturaId = fatura.id
+                    } else {
+                        val monthId = CustomCalendarView.getMonthId(fatura.mes!!)
+                        val nextMonth = CustomCalendarView.getNextMonth(monthId!!)
+                        var proximaFatura =
+                            faturaRepository.findByCartaoIdAndMes(fatura.cartaoId!!, nextMonth!!)
+                        if (proximaFatura != null) lancamento.faturaId = proximaFatura.id!!
+                        else {
+                            proximaFatura = Fatura().apply {
+                                this.usuarioId = fatura.usuarioId
+                                this.titulo = "Fatura do mês de $nextMonth"
+                                this.pago = false
+                                this.mes = nextMonth
+                                this.diaFechamento = fatura.diaFechamento
+                                this.descricao = "Fatura do mês de $nextMonth"
+                                this.cartaoId = fatura.cartaoId
+                            }
+                            faturaRepository.save(proximaFatura)
+                            lancamento.faturaId = proximaFatura.id!!
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validarCarteira(lancamento: Lancamento) {
+        viewModel.carteiraId.value.let {
+            if (it != null && it != Constantes.ZERO_LONG) {
+                val carteira = carteiraRepository.findById(it)
+                if (carteira != null) lancamento.carteiraId = carteira.id!!
+            }
         }
     }
 
@@ -75,7 +132,6 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         lancamento.valor = this.etValor!!.currencyDouble
         lancamento.data = this.etData!!.text.toString()
         lancamento.quantidadeParcelas = this.etQtParcelas!!.text.toString().toInt()
-        lancamento.carteiraId = viewModel.carteiraId.value
         return lancamento
     }
 

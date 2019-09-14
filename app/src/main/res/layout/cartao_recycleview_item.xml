@@ -87,8 +87,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tx_valor_fatura"
+            <com.viictrp.financeapp.ui.custom.RialTextView
+                android:id="@+id/tx_valor_limite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/orcamento_placeholder"
@@ -125,7 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="@string/fechamento_dia"
+                android:text="@string/underline_placeholder"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="@+id/lb_fechamento"
                 app:layout_constraintStart_toEndOf="@+id/lb_fechamento"

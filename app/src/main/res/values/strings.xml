@@ -31,8 +31,8 @@
     <string name="balanco">balanço</string>
     <string name="numero_cartao">1234</string>
     <string name="bandeira_placeholder">VISA</string>
-    <string name="fechamento">fechamento</string>
-    <string name="fechamento_dia">17/07</string>
+    <string name="fechamento">fechamento dia</string>
+    <string name="underline_placeholder">__</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -35,7 +35,7 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
     ): View? {
         (this.activity!! as MainActivity).disableActionBarButton()
         viewModel = ViewModelProviders.of(this).get(GerenciarOrcamentoViewModel::class.java)
-        return inflater.inflate(R.layout.gerenciar_orcamento_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_gerenciar_orcamento, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

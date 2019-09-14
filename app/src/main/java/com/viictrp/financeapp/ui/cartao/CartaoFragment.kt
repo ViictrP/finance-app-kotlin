@@ -5,17 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.ImageButton
+import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.MainActivity
@@ -23,6 +21,7 @@ import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Cartao
+import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.FaturaRepository
@@ -30,13 +29,12 @@ import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
-import com.viictrp.financeapp.ui.custom.LinePagerIndicatorDecoration
-import com.viictrp.financeapp.ui.custom.SnapOnScrollListener
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
 import com.viictrp.financeapp.utils.CarouselBuilder
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
+import java.util.*
 
 class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnItemChangedListener {
 
@@ -76,6 +74,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun init() {
+        val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
+        this.calendarView.setMonth(monthId)
         this.lancamentoRepository = LancamentoRepository(this.context!!)
         this.cartaoRepository = CartaoRepository(this.context!!)
         this.faturaRepository = FaturaRepository(this.context!!)
@@ -85,11 +85,13 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private fun initObservers() {
         cartaoViewModel.cartoes.observe(this, Observer {
             val adapter = this.crCartoes.adapter as CartaoAdapter
+            onItemChangedListener(Constantes.ZERO)
             adapter.setList(it.toMutableList())
         })
     }
 
     private fun initChildren(root: View) {
+        root.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
         this.crCartoes = CarouselBuilder()
             .convertToCarousel(root.findViewById(R.id.cr_cartoes), this.context!!, this)
             .withDecoration(CirclePagerIndicatorDecoration())
@@ -115,20 +117,11 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun loadCartoes() {
-//        val cartoes = cartaoRepository.findCartaoByUsuarioId(Constantes.SYSTEM_USER)
-        val cartoes = mutableListOf(Cartao().apply {
-            this.limite = 12500.toDouble()
-            this.dataFechamento = 10
-            this.descricao = "Itaucard Visa Gold"
-        }, Cartao().apply {
-            this.limite = 8500.toDouble()
-            this.dataFechamento = 10
-            this.descricao = "Itaucard Tam"
-        })
+        val cartoes = cartaoRepository.findCartaoByUsuarioId(Constantes.SYSTEM_USER)
         cartaoViewModel.cartoes.postValue(cartoes)
     }
 
-    fun deleteLancamento(lancamento: Lancamento) {
+    private fun deleteLancamento(lancamento: Lancamento) {
         lancamentoRepository.delete(lancamento)
         Snackbar.make(
             this.view!!,
@@ -138,8 +131,43 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     override fun onItemChangedListener(position: Int) {
-        Snackbar.make(this.view!!, "Position changed $position", Snackbar.LENGTH_SHORT)
-            .show()
+        cartaoViewModel.cartoes.value.let {
+            it.let { cartoes ->
+                val cartao = cartoes!![position]
+                cartaoViewModel.cartaoSelecionado.postValue(cartao)
+                buscarLancamentosDoMesOuCriarNovaFatura(
+                    cartao,
+                    CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1)
+                )
+            }
+        }
+    }
+
+    private fun buscarLancamentosDoMesOuCriarNovaFatura(
+        cartao: Cartao,
+        mes: String?
+    ) {
+        val fatura = faturaRepository.findByCartaoIdAndMes(cartao.id!!, mes!!)
+        if (fatura != null) {
+            val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
+            cartaoViewModel.lancamentos.postValue(lancamentos)
+        } else criarFaturaNoMes(cartao, mes)
+    }
+
+    private fun criarFaturaNoMes(
+        cartao: Cartao,
+        mes: String?
+    ) {
+        val fatura = Fatura().apply {
+            this.cartaoId = cartao.id
+            this.descricao = "Fatura do mês de $mes"
+            this.diaFechamento = cartao.dataFechamento
+            this.mes = mes
+            this.pago = false
+            this.titulo = "Fatura do mês de $mes"
+            this.usuarioId = cartao.usuarioId
+        }
+        faturaRepository.save(fatura)
     }
 
     override fun onClick(button: View?) {
@@ -147,10 +175,19 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             R.id.action_bar_button -> navController.navigate(
                 R.id.action_navegacao_cartao_to_gerenciarCartao
             )
+            R.id.btn_novo_lancamento -> navController.navigate(
+                R.id.action_navegacao_cartao_to_lancamentoFragment,
+                bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
+            )
         }
     }
 
     override fun onMonthChange(month: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        cartaoViewModel.cartaoSelecionado.value.let {
+            if (it != null) buscarLancamentosDoMesOuCriarNovaFatura(
+                it,
+                CustomCalendarView.getMonthDescription(month)
+            )
+        }
     }
 }

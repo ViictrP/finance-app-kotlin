@@ -10,8 +10,18 @@ class CarteiraRepository(private val context: Context) {
 
     fun findCarteiraByMes(mes: String): Carteira? {
         val realm = RealmInitializer.getInstance(this.context)
-        return realm.where<Carteira>().equalTo(Constantes.MES, mes)
+        val managedObject = realm.where<Carteira>().equalTo(Constantes.MES, mes)
             .findFirst()
+        return if (managedObject != null) realm.copyFromRealm(managedObject)
+        else null
+    }
+
+    fun findById(carteiraId: Long): Carteira? {
+        val realm = RealmInitializer.getInstance(this.context)
+        val managedObject = realm.where<Carteira>().equalTo(Constantes.ID, carteiraId)
+            .findFirst()
+        return if (managedObject != null) realm.copyFromRealm(managedObject)
+        else null
     }
 
     fun save(carteira: Carteira, finish: (carteira: Carteira?) -> Unit) {

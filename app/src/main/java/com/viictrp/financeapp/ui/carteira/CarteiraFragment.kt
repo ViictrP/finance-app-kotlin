@@ -95,7 +95,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     }
 
     override fun onMonthChange(month: Int) {
-        val mes = this.calendarView.getMonthDescription(month)
+        val mes = CustomCalendarView.getMonthDescription(month)
         this.loadCarteira(mes!!)
     }
 
@@ -142,7 +142,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private fun init() {
         val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
         this.calendarView.setMonth(monthId)
-        val mes = this.calendarView.getMonthDescription(monthId)
+        val mes = CustomCalendarView.getMonthDescription(monthId)
         this.lancamentoRepository = LancamentoRepository(this.context!!)
         this.carteiraRepository = CarteiraRepository(this.context!!)
         this.orcamentoRepository = OrcamentoRepository(this.context!!)
@@ -255,7 +255,10 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
                 val lancamento = adapter.getList()!![position]
                 deleteLancamento(lancamento)
                 adapter.removeAt(position)
-                calcularValorTotalGasto(adapter.getList(), carteiraViewModel.orcamento.value!!.valor!!)
+                calcularValorTotalGasto(
+                    adapter.getList(),
+                    carteiraViewModel.orcamento.value!!.valor!!
+                )
             }
         }
 

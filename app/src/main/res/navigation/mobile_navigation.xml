@@ -20,18 +20,18 @@
         <action
             android:id="@+id/action_navegacao_carteira_to_navegacao_orcamento"
             app:destination="@id/navegacao_orcamento"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_left"
             app:popUpTo="@+id/navegacao_carteira" />
         <action
             android:id="@+id/action_navegacao_carteira_to_lancamentoFragment"
             app:destination="@id/lancamentoFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_left" />
     </fragment>
 
     <fragment
@@ -41,14 +41,19 @@
         tools:layout="@layout/fragment_cartao" >
         <action
             android:id="@+id/action_navegacao_cartao_to_lancamentoFragment"
-            app:destination="@id/lancamentoFragment" />
+            app:destination="@id/lancamentoFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_left" />
         <action
             android:id="@+id/action_navegacao_cartao_to_gerenciarCartao"
             app:destination="@id/gerenciarCartao"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_left"
+            app:popUpTo="@+id/navegacao_cartao" />
     </fragment>
 
     <fragment
@@ -60,19 +65,18 @@
         <action
             android:id="@+id/action_navegacao_orcamento_to_gerenciarOrcamento"
             app:destination="@id/gerenciarOrcamento"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@+id/navegacao_orcamento"
-        />
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_left"
+            app:popUpTo="@+id/navegacao_orcamento" />
     </fragment>
 
     <fragment
         android:id="@+id/gerenciarOrcamento"
         android:name="com.viictrp.financeapp.ui.orcamento.GerenciarOrcamento"
         android:label="Gerenciar orçamento"
-        tools:layout="@layout/gerenciar_orcamento_fragment">
+        tools:layout="@layout/fragment_gerenciar_orcamento">
         <argument android:name="orcamentoId" app:argType="long" />
     </fragment>
 
@@ -86,7 +90,7 @@
     </fragment>
     <fragment
         android:id="@+id/gerenciarCartao"
-        android:name="com.viictrp.financeapp.ui.cartao.GerenciarCartao"
+        android:name="com.viictrp.financeapp.ui.cartao.GerenciarCartaoFragment"
         android:label="fragment_gerenciar_cartao"
         tools:layout="@layout/fragment_gerenciar_cartao" />
 

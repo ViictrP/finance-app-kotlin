@@ -16,33 +16,87 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
 
     private lateinit var onMonthChangeListener: OnMonthChangeListener
 
-    val JANEIRO = 1
-    val FEVEREIRO = 2
-    val MARCO = 3
-    val ABRIL = 4
-    val MAIO = 5
-    val JUNHO = 6
-    val JULHO = 7
-    val AGOSTO = 8
-    val SETEMBRO = 9
-    val OUTUBRO = 10
-    val NOVEMBRO = 11
-    val DEZEMBRO = 12
+    companion object {
 
-    private val months = mapOf(
-        1 to "JANEIRO",
-        2 to "FEVEREIRO",
-        3 to "MARÇO",
-        4 to "ABRIL",
-        5 to "MAIO",
-        6 to "JUNHO",
-        7 to "JULHO",
-        8 to "AGOSTO",
-        9 to "SETEMBRO",
-        10 to "OUTUBRO",
-        11 to "NOVEMBRO",
-        12 to "DEZEMBRO"
-    )
+        private val months = mapOf(
+            1 to "JANEIRO",
+            2 to "FEVEREIRO",
+            3 to "MARÇO",
+            4 to "ABRIL",
+            5 to "MAIO",
+            6 to "JUNHO",
+            7 to "JULHO",
+            8 to "AGOSTO",
+            9 to "SETEMBRO",
+            10 to "OUTUBRO",
+            11 to "NOVEMBRO",
+            12 to "DEZEMBRO"
+        )
+
+        val JANEIRO = 1
+        val FEVEREIRO = 2
+        val MARCO = 3
+        val ABRIL = 4
+        val MAIO = 5
+        val JUNHO = 6
+        val JULHO = 7
+        val AGOSTO = 8
+        val SETEMBRO = 9
+        val OUTUBRO = 10
+        val NOVEMBRO = 11
+        val DEZEMBRO = 12
+
+        /**
+         * Obtém a descrição de um mês
+         *
+         * @param month - posição do mês no map
+         */
+        fun getMonthDescription(month: Int): String? {
+            return when (month) {
+                JANEIRO -> return months[JANEIRO]
+                FEVEREIRO -> return months[FEVEREIRO]
+                MARCO -> return months[MARCO]
+                ABRIL -> return months[ABRIL]
+                MAIO -> return months[MAIO]
+                JUNHO -> return months[JUNHO]
+                JULHO -> return months[JULHO]
+                AGOSTO -> return months[AGOSTO]
+                SETEMBRO -> return months[SETEMBRO]
+                OUTUBRO -> return months[OUTUBRO]
+                NOVEMBRO -> return months[NOVEMBRO]
+                DEZEMBRO -> return months[DEZEMBRO]
+                else -> null
+            }
+        }
+
+        fun getNextMonth(month: Int): String? {
+            return if (month == DEZEMBRO) {
+                getMonthDescription(JANEIRO)
+            } else {
+                getMonthDescription(month + 1)
+            }
+        }
+
+        fun getMonthId(month: String): Int? {
+            return when (month) {
+                "JANEIRO" -> return JANEIRO
+                "FEVEREIRO" -> return FEVEREIRO
+                "MARCO" -> return MARCO
+                "ABRIL" -> return ABRIL
+                "MAIO" -> return MAIO
+                "JUNHO" -> return JUNHO
+                "JULHO" -> return JULHO
+                "AGOSTO" -> return AGOSTO
+                "SETEMBRO" -> return SETEMBRO
+                "OUTUBRO" -> return OUTUBRO
+                "NOVEMBRO" -> return NOVEMBRO
+                "DEZEMBRO" -> return DEZEMBRO
+                else -> null
+            }
+        }
+    }
+
+
     private var month: Int = Calendar.getInstance().get(Calendar.MONTH)
     private var root: View = LayoutInflater.from(context)
         .inflate(R.layout.custom_calendar_layout, this, true)
@@ -52,8 +106,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-    )
-            : super(context, attrs, defStyleAttr)
+    ) : super(context, attrs, defStyleAttr)
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     constructor(
@@ -61,8 +114,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         attrs: AttributeSet?,
         defStyleAttr: Int,
         defStyleRes: Int
-    )
-            : super(context, attrs, defStyleAttr, defStyleRes)
+    ) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
         orientation = VERTICAL
@@ -76,29 +128,6 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
      */
     fun setOnMonthChangeListener(listener: OnMonthChangeListener) {
         this.onMonthChangeListener = listener
-    }
-
-    /**
-     * Obtém a descrição de um mês
-     *
-     * @param month - posição do mês no map
-     */
-    fun getMonthDescription(month: Int): String? {
-        return when(month) {
-            JANEIRO     -> return months[JANEIRO]
-            FEVEREIRO   -> return months[FEVEREIRO]
-            MARCO       -> return months[MARCO]
-            ABRIL       -> return months[ABRIL]
-            MAIO        -> return months[MAIO]
-            JUNHO       -> return months[JUNHO]
-            JULHO       -> return months[JULHO]
-            AGOSTO      -> return months[AGOSTO]
-            SETEMBRO    -> return months[SETEMBRO]
-            OUTUBRO     -> return months[OUTUBRO]
-            NOVEMBRO    -> return months[NOVEMBRO]
-            DEZEMBRO    -> return months[DEZEMBRO]
-            else        -> null
-        }
     }
 
     /**

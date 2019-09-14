@@ -10,14 +10,18 @@ class OrcamentoRepository(private val context: Context) {
 
     fun findOrcamentoByCarteiraId(carteiraId: Long): Orcamento? {
         val realm = RealmInitializer.getInstance(this.context)
-        return realm.where<Orcamento>().equalTo(Constantes.CARTEIRA_ID, carteiraId)
+        val managedObject = realm.where<Orcamento>().equalTo(Constantes.CARTEIRA_ID, carteiraId)
             .findFirst()
+        return if (managedObject != null) realm.copyFromRealm(managedObject)
+        else null
     }
 
     fun findById(orcamentoId: Long): Orcamento? {
         val realm = RealmInitializer.getInstance(this.context)
-        return realm.where<Orcamento>().equalTo(Constantes.ID, orcamentoId)
+        val managedObject = realm.where<Orcamento>().equalTo(Constantes.ID, orcamentoId)
             .findFirst()
+        return if (managedObject != null) realm.copyFromRealm(managedObject)
+        else null
     }
 
     fun save(orcamento: Orcamento, finish: (orcamento: Orcamento?) -> Unit) {

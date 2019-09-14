@@ -10,10 +10,12 @@ class CartaoRepository(private var context: Context) {
 
     fun findCartaoByUsuarioId(usuarioId: Long): List<Cartao> {
         val realm = RealmInitializer.getInstance(context)
-        return realm.where<Cartao>()
-            .equalTo(Constantes.USUARIO_ID, usuarioId)
-            .findAll()
-            .toList()
+        return realm.copyFromRealm(
+            realm.where<Cartao>()
+                .equalTo(Constantes.USUARIO_ID, usuarioId)
+                .findAll()
+                .toList()
+        )
     }
 
     fun save(cartao: Cartao, finish: (cartao: Cartao) -> Unit) {

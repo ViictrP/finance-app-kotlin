@@ -9,11 +9,13 @@ class Constantes {
 
         val ORCAMENTO_ID_KEY = "orcamentoId"
         val CARTEIRA_ID_KEY = "carteiraId"
+        val CARTAO_ID_KEY = "cartaoId"
 
         // Realm
         val ID = "id"
         val MES = "mes"
         val CARTEIRA_ID = "carteiraId"
+        val FATURA_ID = "faturaId"
         val USUARIO_ID = "usuarioId"
         val CARTAO_ID = "cartaoId"
         val SYSTEM_USER = 1L

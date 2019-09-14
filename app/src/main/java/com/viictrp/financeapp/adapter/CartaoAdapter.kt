@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Cartao
+import kotlinx.android.synthetic.main.cartao_recycleview_item.view.*
 
 class CartaoAdapter(
     private var cartoes: MutableList<Cartao>,
@@ -37,8 +38,17 @@ class CartaoAdapter(
 
     class CartaoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        private val txValorLimit = itemView.tx_valor_limite
+        private val txCartaoBandeira = itemView.tx_cartao_bandeira
+        private val txFechamento = itemView.tx_fechamento
+        private val txNumeroCartao = itemView.tx_numero_cartao
+
         fun bindView(cartao: Cartao, transitionNameIndex: Int) {
             itemView.transitionName = "cv_cartao_credito$transitionNameIndex"
+            txValorLimit.text = cartao.limite.toString()
+            txCartaoBandeira.text = cartao.bandeira
+            txFechamento.text = cartao.dataFechamento.toString()
+            txNumeroCartao.text = cartao.numeroCartao
         }
     }
 }
