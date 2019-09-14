@@ -155,7 +155,6 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         if (fatura != null) {
             val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
             cartaoViewModel.lancamentos.postValue(lancamentos)
-            cartaoViewModel.faturaSelecionada.postValue(fatura)
         } else criarFaturaNoMes(cartao, mes)
     }
 
@@ -185,7 +184,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                 // TODO passar o ID do cartão para criar novo lançamento
                 // o ID da fatura não será necessário pois buscará a fatura do mês do lançamento
                 // para execução da lógica de cadastro
-                bundleOf(Constantes.FATURA_ID_KEY to cartaoViewModel.faturaSelecionada.value?.id)
+                bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
             )
         }
     }

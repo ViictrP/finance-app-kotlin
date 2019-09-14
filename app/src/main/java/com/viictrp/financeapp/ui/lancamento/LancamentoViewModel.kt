@@ -6,7 +6,7 @@ import java.util.*
 
 class LancamentoViewModel : ViewModel() {
     var carteiraId: MutableLiveData<Long> = MutableLiveData()
-    var faturaId: MutableLiveData<Long> = MutableLiveData()
+    var cartaoId: MutableLiveData<Long> = MutableLiveData()
     var titulo: MutableLiveData<String> = MutableLiveData()
     var descricao: MutableLiveData<String> = MutableLiveData()
     var valor: MutableLiveData<Double> = MutableLiveData()

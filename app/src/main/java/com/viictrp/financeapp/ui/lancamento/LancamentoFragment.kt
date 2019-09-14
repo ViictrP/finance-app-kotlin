@@ -65,7 +65,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         bindObservers()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
         viewModel.carteiraId.postValue(arguments?.getLong(Constantes.CARTEIRA_ID_KEY))
-        viewModel.faturaId.postValue(arguments?.getLong(Constantes.FATURA_ID_KEY))
+        viewModel.cartaoId.postValue(arguments?.getLong(Constantes.CARTAO_ID_KEY))
     }
 
     override fun onClick(view: View?) {
@@ -88,16 +88,19 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     }
 
     private fun validarFatura(lancamento: Lancamento) {
-        viewModel.faturaId.value.let {
+        viewModel.cartaoId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
                 setarFaturaId(it, lancamento)
             }
         }
     }
 
-    private fun setarFaturaId(it: Long, lancamento: Lancamento) {
-        val fatura = faturaRepository.findById(it)
-        // TODO pegar o mês do lançamento ao invés do ID da fatura
+    private fun setarFaturaId(cartao: Long, lancamento: Lancamento) {
+        val mes = lancamento.data!!.split("/")[Constantes.UM]
+        val fatura = faturaRepository.findByCartaoIdAndMes(
+            cartao,
+            CustomCalendarView.getMonthDescription(mes.toInt())!!
+        )
         if (fatura != null) {
             val diaLancamento = lancamento.data!!.split("/")[Constantes.ZERO]
             if (fatura.diaFechamento!! > diaLancamento.toLong()) {
