@@ -27,6 +27,7 @@ class LancamentoAdapter(
 
     fun setList(lancamentos: MutableList<Lancamento>) {
         this.lancamentos = lancamentos
+        notifyDataSetChanged()
     }
 
     fun getList(): List<Lancamento>? {

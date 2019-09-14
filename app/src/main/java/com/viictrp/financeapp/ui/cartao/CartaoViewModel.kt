@@ -10,6 +10,7 @@ class CartaoViewModel : ViewModel() {
 
     val cartoes: MutableLiveData<List<Cartao>> = MutableLiveData()
     val cartaoSelecionado: MutableLiveData<Cartao> = MutableLiveData()
+    val faturaSelecionada: MutableLiveData<Fatura> = MutableLiveData()
     val faturas: MutableLiveData<List<Fatura>> = MutableLiveData()
     val lancamentos: MutableLiveData<List<Lancamento>> = MutableLiveData()
 }

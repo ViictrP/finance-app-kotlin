@@ -88,6 +88,10 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             onItemChangedListener(Constantes.ZERO)
             adapter.setList(it.toMutableList())
         })
+        cartaoViewModel.lancamentos.observe(this, Observer {
+            val adapter = this.rvLancamentos.adapter as LancamentoAdapter
+            adapter.setList(it.toMutableList())
+        })
     }
 
     private fun initChildren(root: View) {
@@ -151,6 +155,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         if (fatura != null) {
             val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
             cartaoViewModel.lancamentos.postValue(lancamentos)
+            cartaoViewModel.faturaSelecionada.postValue(fatura)
         } else criarFaturaNoMes(cartao, mes)
     }
 
@@ -177,7 +182,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             )
             R.id.btn_novo_lancamento -> navController.navigate(
                 R.id.action_navegacao_cartao_to_lancamentoFragment,
-                bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
+                bundleOf(Constantes.FATURA_ID_KEY to cartaoViewModel.faturaSelecionada.value?.id)
             )
         }
     }

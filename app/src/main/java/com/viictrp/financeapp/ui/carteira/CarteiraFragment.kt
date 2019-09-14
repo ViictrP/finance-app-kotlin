@@ -112,7 +112,6 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         carteiraViewModel.lancamentos.observe(this, Observer {
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
-            adapter.notifyDataSetChanged()
         })
 
         carteiraViewModel.progressBarProgress.observe(this, Observer {

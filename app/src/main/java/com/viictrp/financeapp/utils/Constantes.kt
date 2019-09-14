@@ -6,10 +6,13 @@ class Constantes {
         val ZERO = 0
         val ZERO_FLOAT = 0f
         val ZERO_LONG = 0L
+        val UM = 1
+        val DOIS = 2
 
         val ORCAMENTO_ID_KEY = "orcamentoId"
         val CARTEIRA_ID_KEY = "carteiraId"
         val CARTAO_ID_KEY = "cartaoId"
+        val FATURA_ID_KEY = "cartaoId"
 
         // Realm
         val ID = "id"

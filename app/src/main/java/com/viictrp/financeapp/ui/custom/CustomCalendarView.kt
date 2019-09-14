@@ -77,6 +77,15 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
             }
         }
 
+        fun getNextMonth(month: String): String? {
+            val monthId = CustomCalendarView.getMonthId(month)
+            return if (monthId == DEZEMBRO) {
+                getMonthDescription(JANEIRO)
+            } else {
+                getMonthDescription(monthId!! + 1)
+            }
+        }
+
         fun getMonthId(month: String): Int? {
             return when (month) {
                 "JANEIRO" -> return JANEIRO

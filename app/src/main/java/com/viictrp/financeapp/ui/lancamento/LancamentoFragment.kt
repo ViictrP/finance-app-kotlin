@@ -65,14 +65,18 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         bindObservers()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
         viewModel.carteiraId.postValue(arguments?.getLong(Constantes.CARTEIRA_ID_KEY))
-        viewModel.faturaId.postValue(arguments?.getLong(Constantes.CARTAO_ID_KEY))
+        viewModel.faturaId.postValue(arguments?.getLong(Constantes.FATURA_ID_KEY))
     }
 
     override fun onClick(view: View?) {
         val lancamento = getLancamento()
         validarCarteiraOuFatura(lancamento)
         lancamentoRepository.save(lancamento) {
-            Snackbar.make(this.view!!, "Lançamento criado com sucesso.", Snackbar.LENGTH_SHORT)
+            val monthId = lancamento.data!!.split("/")[Constantes.UM]
+            val mes = CustomCalendarView.getMonthDescription(monthId.toInt())
+            val msg = if (it!!.carteiraId != null) "Lançamento criado na carteira do mês de $mes"
+            else "Lançamento criado na fatura do mês de $mes"
+            Snackbar.make(this.view!!, msg, Snackbar.LENGTH_LONG)
                 .show()
             navController?.navigateUp()
         }
@@ -86,34 +90,49 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private fun validarFatura(lancamento: Lancamento) {
         viewModel.faturaId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
-                val fatura = faturaRepository.findById(it)
-                if (fatura != null) {
-                    val diaLancamento = lancamento.data!!.split("/")[Constantes.ZERO]
-                    if (fatura.diaFechamento!! < diaLancamento.toLong()) {
-                        lancamento.faturaId = fatura.id
-                    } else {
-                        val monthId = CustomCalendarView.getMonthId(fatura.mes!!)
-                        val nextMonth = CustomCalendarView.getNextMonth(monthId!!)
-                        var proximaFatura =
-                            faturaRepository.findByCartaoIdAndMes(fatura.cartaoId!!, nextMonth!!)
-                        if (proximaFatura != null) lancamento.faturaId = proximaFatura.id!!
-                        else {
-                            proximaFatura = Fatura().apply {
-                                this.usuarioId = fatura.usuarioId
-                                this.titulo = "Fatura do mês de $nextMonth"
-                                this.pago = false
-                                this.mes = nextMonth
-                                this.diaFechamento = fatura.diaFechamento
-                                this.descricao = "Fatura do mês de $nextMonth"
-                                this.cartaoId = fatura.cartaoId
-                            }
-                            faturaRepository.save(proximaFatura)
-                            lancamento.faturaId = proximaFatura.id!!
-                        }
-                    }
-                }
+                setarFaturaId(it, lancamento)
             }
         }
+    }
+
+    private fun setarFaturaId(it: Long, lancamento: Lancamento) {
+        val fatura = faturaRepository.findById(it)
+        if (fatura != null) {
+            val diaLancamento = lancamento.data!!.split("/")[Constantes.ZERO]
+            if (fatura.diaFechamento!! > diaLancamento.toLong()) {
+                lancamento.faturaId = fatura.id
+            } else {
+                setarFaturaIdProximaFatura(fatura, lancamento)
+            }
+        }
+    }
+
+    private fun setarFaturaIdProximaFatura(fatura: Fatura, lancamento: Lancamento) {
+        val nextMonth = CustomCalendarView.getNextMonth(fatura.mes!!)
+        var proximaFatura =
+            faturaRepository.findByCartaoIdAndMes(fatura.cartaoId!!, nextMonth!!)
+        if (proximaFatura != null) lancamento.faturaId = proximaFatura.id!!
+        else {
+            proximaFatura = criarProximaFatura(fatura, nextMonth)
+            lancamento.faturaId = proximaFatura.id!!
+        }
+    }
+
+    private fun criarProximaFatura(
+        fatura: Fatura,
+        nextMonth: String?
+    ): Fatura {
+        val proximaFatura = Fatura().apply {
+            this.usuarioId = fatura.usuarioId
+            this.titulo = "Fatura do mês de $nextMonth"
+            this.pago = false
+            this.mes = nextMonth
+            this.diaFechamento = fatura.diaFechamento
+            this.descricao = "Fatura do mês de $nextMonth"
+            this.cartaoId = fatura.cartaoId
+        }
+        faturaRepository.save(proximaFatura)
+        return proximaFatura
     }
 
     private fun validarCarteira(lancamento: Lancamento) {
