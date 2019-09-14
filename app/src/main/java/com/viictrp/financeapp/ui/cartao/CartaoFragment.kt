@@ -85,7 +85,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private fun initObservers() {
         cartaoViewModel.cartoes.observe(this, Observer {
             val adapter = this.crCartoes.adapter as CartaoAdapter
-            onItemChangedListener(Constantes.ZERO)
+            if (it.size > Constantes.ZERO) onItemChangedListener(Constantes.ZERO)
             adapter.setList(it.toMutableList())
         })
         cartaoViewModel.lancamentos.observe(this, Observer {
@@ -182,6 +182,9 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             )
             R.id.btn_novo_lancamento -> navController.navigate(
                 R.id.action_navegacao_cartao_to_lancamentoFragment,
+                // TODO passar o ID do cartão para criar novo lançamento
+                // o ID da fatura não será necessário pois buscará a fatura do mês do lançamento
+                // para execução da lógica de cadastro
                 bundleOf(Constantes.FATURA_ID_KEY to cartaoViewModel.faturaSelecionada.value?.id)
             )
         }

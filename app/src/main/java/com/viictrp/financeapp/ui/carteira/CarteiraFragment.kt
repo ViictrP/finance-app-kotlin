@@ -234,6 +234,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             criarNovoOrcamento(carteira.id, carteira.mes)
             this.activity!!.runOnUiThread {
                 carteiraViewModel.carteira.postValue(it)
+                carteiraViewModel.lancamentos.postValue(mutableListOf())
             }
         }
     }

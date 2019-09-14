@@ -97,6 +97,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
 
     private fun setarFaturaId(it: Long, lancamento: Lancamento) {
         val fatura = faturaRepository.findById(it)
+        // TODO pegar o mês do lançamento ao invés do ID da fatura
         if (fatura != null) {
             val diaLancamento = lancamento.data!!.split("/")[Constantes.ZERO]
             if (fatura.diaFechamento!! > diaLancamento.toLong()) {
