@@ -11,6 +11,10 @@
     <string name="money_placeholder">10000</string>
     <string name="month_placeholder">AGOSTO</string>
     <string name="descricao_placeholder">descrição</string>
+    <string name="diafechamento_placeholder">dia de fechamento</string>
+    <string name="limite_placeholder">limite</string>
+    <string name="bandeira_novocartao_placeholder">bandeira</string>
+    <string name="ultimosdigitos_placeholder">1234</string>
     <string name="titulo_placeholder">título</string>
     <string name="valor_placeholder">R$0,00</string>
     <string name="quantidade_parcelas_placeholder">1</string>
@@ -21,6 +25,7 @@
     <string name="btn_salvar">Salvar</string>
     <string name="gerenciar_orcamento_text">Insira o valor do orçamento para editar, depois clique em salvar para realizar a alteração.</string>
     <string name="novo_lancamento_subtitle">Adicionar novo lançamento.</string>
+    <string name="novo_cartao_title">Adicionar novo cartão.</string>
     <string name="preencha_tudo">Por favor preencha todos os campos.</string>
     <string name="app_img_content_description">Logomarca do aplicativo.</string>
     <string name="balanco">balanço</string>

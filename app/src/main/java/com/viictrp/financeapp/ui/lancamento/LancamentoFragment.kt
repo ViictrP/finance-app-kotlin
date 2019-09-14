@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.LancamentoRepository
@@ -43,6 +44,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (this.activity!! as MainActivity).disableActionBarButton()
         return inflater.inflate(R.layout.fragment_lancamento, container, false)
     }
 

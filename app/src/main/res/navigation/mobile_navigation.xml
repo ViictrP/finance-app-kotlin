@@ -38,7 +38,18 @@
         android:id="@+id/navegacao_cartao"
         android:name="com.viictrp.financeapp.ui.cartao.CartaoFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_cartao" />
+        tools:layout="@layout/fragment_cartao" >
+        <action
+            android:id="@+id/action_navegacao_cartao_to_lancamentoFragment"
+            app:destination="@id/lancamentoFragment" />
+        <action
+            android:id="@+id/action_navegacao_cartao_to_gerenciarCartao"
+            app:destination="@id/gerenciarCartao"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/navegacao_orcamento"
@@ -73,5 +84,10 @@
         <argument android:name="carteiraId" app:argType="long" />
         <argument android:name="faturaId" app:argType="long" />
     </fragment>
+    <fragment
+        android:id="@+id/gerenciarCartao"
+        android:name="com.viictrp.financeapp.ui.cartao.GerenciarCartao"
+        android:label="fragment_gerenciar_cartao"
+        tools:layout="@layout/fragment_gerenciar_cartao" />
 
 </navigation>

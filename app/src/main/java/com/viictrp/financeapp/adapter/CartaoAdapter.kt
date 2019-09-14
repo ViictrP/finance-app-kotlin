@@ -13,6 +13,8 @@ class CartaoAdapter(
     private var context: Context
 ) : RecyclerView.Adapter<CartaoAdapter.CartaoViewHolder>() {
 
+    private var transitionNameIndex = 1
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartaoViewHolder {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.cartao_recycleview_item, parent, false)
@@ -24,7 +26,8 @@ class CartaoAdapter(
     }
 
     override fun onBindViewHolder(holder: CartaoViewHolder, position: Int) {
-        holder.bindView(cartoes[position])
+        holder.bindView(cartoes[position], transitionNameIndex)
+        this.transitionNameIndex++
     }
 
     fun setList(cartoes: MutableList<Cartao>) {
@@ -34,8 +37,8 @@ class CartaoAdapter(
 
     class CartaoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindView(cartao: Cartao) {
-
+        fun bindView(cartao: Cartao, transitionNameIndex: Int) {
+            itemView.transitionName = "cv_cartao_credito$transitionNameIndex"
         }
     }
 }

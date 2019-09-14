@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.realm.RealmInitializer
@@ -32,6 +33,7 @@ class GerenciarOrcamento : Fragment(), OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (this.activity!! as MainActivity).disableActionBarButton()
         viewModel = ViewModelProviders.of(this).get(GerenciarOrcamentoViewModel::class.java)
         return inflater.inflate(R.layout.gerenciar_orcamento_fragment, container, false)
     }

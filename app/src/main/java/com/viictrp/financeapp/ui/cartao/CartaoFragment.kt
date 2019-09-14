@@ -5,14 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.widget.ImageButton
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
@@ -21,15 +27,20 @@ import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.FaturaRepository
 import com.viictrp.financeapp.repository.LancamentoRepository
+import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.LinePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
+import com.viictrp.financeapp.utils.CarouselBuilder
+import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
 
 class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnItemChangedListener {
+
+    private lateinit var navController: NavController
 
     private lateinit var cartaoViewModel: CartaoViewModel
     private lateinit var crCartoes: RecyclerView
@@ -53,6 +64,11 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = view.findNavController()
+        (this.activity!! as MainActivity).displayActionBarButton(
+            R.drawable.ic_credit_card_with_plus_sign_24,
+            this
+        )
         cartaoViewModel = ViewModelProviders.of(this).get(CartaoViewModel::class.java)
         initChildren(view)
         initObservers()
@@ -74,18 +90,11 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun initChildren(root: View) {
-        this.crCartoes = root.findViewById(R.id.cr_cartoes)
+        this.crCartoes = CarouselBuilder()
+            .convertToCarousel(root.findViewById(R.id.cr_cartoes), this.context!!, this)
+            .withDecoration(CirclePagerIndicatorDecoration())
+            .build()
         this.crCartoes.adapter = CartaoAdapter(mutableListOf(), this.context!!)
-        this.crCartoes.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-        val mSnapHelper = LinearSnapHelper()
-        mSnapHelper.attachToRecyclerView(this.crCartoes)
-        val snapOnScrollListener = SnapOnScrollListener(
-            mSnapHelper,
-            SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE,
-            this
-        )
-        this.crCartoes.addOnScrollListener(snapOnScrollListener)
-        this.crCartoes.addItemDecoration(LinePagerIndicatorDecoration())
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
         this.calendarView.setOnMonthChangeListener(this)
         this.rvLancamentos = root.findViewById(R.id.rv_lancamentos_cartoes)
@@ -133,8 +142,12 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             .show()
     }
 
-    override fun onClick(p0: View?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onClick(button: View?) {
+        when (button!!.id) {
+            R.id.action_bar_button -> navController.navigate(
+                R.id.action_navegacao_cartao_to_gerenciarCartao
+            )
+        }
     }
 
     override fun onMonthChange(month: Int) {

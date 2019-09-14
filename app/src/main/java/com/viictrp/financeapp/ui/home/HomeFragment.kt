@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.utils.StatusBarTheme
 
@@ -23,6 +24,7 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(this, Observer {
             textView.text = it
         })
+        (this.activity!! as MainActivity).disableActionBarButton()
         return root
     }
 }

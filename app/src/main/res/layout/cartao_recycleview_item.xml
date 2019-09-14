@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center">
@@ -17,7 +18,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/buttonTintColor">
+            android:background="@color/creditCardBg">
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:background="@color/labelTintColorAccent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/dots_1"
@@ -25,9 +36,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginBottom="20dp"
-                android:tint="@color/white"
                 android:contentDescription="@string/placeholder"
                 android:src="@drawable/ic_four_dots_horizontally_aligned_as_a_line_48"
+                android:tint="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -35,8 +46,8 @@
                 android:id="@+id/dots_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/placeholder"
                 android:layout_marginStart="20dp"
+                android:contentDescription="@string/placeholder"
                 android:src="@drawable/ic_four_dots_horizontally_aligned_as_a_line_48"
                 android:tint="@color/white"
                 app:layout_constraintBottom_toBottomOf="@+id/dots_1"
@@ -57,9 +68,9 @@
                 android:id="@+id/tx_numero_cartao"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:text="@string/numero_cartao"
                 android:textColor="@color/white"
-                android:layout_marginStart="20dp"
                 android:textSize="25sp"
                 app:layout_constraintBottom_toBottomOf="@+id/dots_3"
                 app:layout_constraintStart_toEndOf="@+id/dots_3"
@@ -69,10 +80,10 @@
                 android:id="@+id/lb_valor_fatura"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
                 android:text="@string/balanco"
                 android:textColor="@color/white"
+                android:layout_marginStart="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/view"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -82,20 +93,20 @@
                 android:layout_height="wrap_content"
                 android:text="@string/orcamento_placeholder"
                 android:textColor="@color/white"
-                android:layout_marginTop="10dp"
                 android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="@+id/view"
                 app:layout_constraintStart_toStartOf="@+id/lb_valor_fatura"
-                app:layout_constraintTop_toBottomOf="@+id/lb_valor_fatura" />
+                app:layout_constraintTop_toTopOf="@+id/view" />
 
             <TextView
                 android:id="@+id/tx_cartao_bandeira"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:text="@string/bandeira_placeholder"
                 android:textColor="@color/white"
                 android:textSize="25sp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -103,9 +114,9 @@
                 android:id="@+id/lb_fechamento"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:text="@string/fechamento"
                 android:textColor="@color/white"
-                android:layout_marginBottom="10dp"
                 app:layout_constraintBottom_toTopOf="@+id/dots_1"
                 app:layout_constraintStart_toStartOf="@+id/dots_1" />
 
@@ -113,9 +124,9 @@
                 android:id="@+id/tx_fechamento"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:text="@string/fechamento_dia"
                 android:textColor="@color/white"
-                android:layout_marginStart="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/lb_fechamento"
                 app:layout_constraintStart_toEndOf="@+id/lb_fechamento"
                 app:layout_constraintTop_toTopOf="@+id/lb_fechamento" />

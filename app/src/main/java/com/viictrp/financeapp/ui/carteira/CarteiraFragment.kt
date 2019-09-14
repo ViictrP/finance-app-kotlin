@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.model.Carteira
@@ -56,6 +57,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (this.activity!! as MainActivity).disableActionBarButton()
         return inflater.inflate(R.layout.fragment_carteira, container, false)
     }
 

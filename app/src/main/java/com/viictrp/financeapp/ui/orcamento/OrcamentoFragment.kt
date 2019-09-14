@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.transition.TransitionInflater
+import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.utils.Constantes
@@ -31,6 +32,7 @@ class OrcamentoFragment : Fragment(), OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (this.activity!! as MainActivity).disableActionBarButton()
         initializeSharedTransitions()
         viewModel = ViewModelProviders.of(this).get(OrcamentoViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_orcamento, container, false)
