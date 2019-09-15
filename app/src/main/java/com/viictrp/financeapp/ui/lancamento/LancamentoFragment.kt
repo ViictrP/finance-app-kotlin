@@ -70,56 +70,53 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         val lancamento = getLancamento()
-        validarCarteiraOuFatura(lancamento)
-        lancamentoRepository.save(lancamento) {
-            val monthId = lancamento.data!!.split("/")[Constantes.UM]
-            val mes = CustomCalendarView.getMonthDescription(monthId.toInt())
-            val msg = if (it!!.carteiraId != null) "Lançamento criado na carteira do mês de $mes"
-            else "Lançamento criado na fatura do mês de $mes"
-            Snackbar.make(this.view!!, msg, Snackbar.LENGTH_LONG)
-                .show()
-            navController?.navigateUp()
-        }
+        salvarNaCarteiraOuFatura(lancamento)
     }
 
-    private fun validarCarteiraOuFatura(lancamento: Lancamento) {
-        validarCarteira(lancamento)
-        validarFatura(lancamento)
+    private fun salvarNaCarteiraOuFatura(lancamento: Lancamento) {
+        salvarNaCarteira(lancamento)
+        salvarNaFatura(lancamento)
     }
 
-    private fun validarFatura(lancamento: Lancamento) {
+    private fun salvarNaFatura(lancamento: Lancamento) {
         viewModel.cartaoId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
-                setarFaturaId(it, lancamento)
+                val dataArr = lancamento.data!!.split("/")
+                val diaLancamento = dataArr[Constantes.ZERO]
+                val mesLancamento = dataArr[Constantes.UM]
+                val fatura = buscarFatura(it, mesLancamento.toInt(), diaLancamento.toLong())
+                if (fatura != null) {
+                    lancamento.faturaId = fatura.id
+                    lancamentoRepository.save(lancamento) {
+                        showMessageAndExit("Lançamento criado na fatura de ${fatura.mes}")
+                    }
+                } else {
+                    showMessageAndExit("A fatura não existe")
+                }
             }
         }
     }
 
-    private fun setarFaturaId(cartao: Long, lancamento: Lancamento) {
-        val mes = lancamento.data!!.split("/")[Constantes.UM]
+    private fun buscarFatura(cartaoId: Long, mes: Int, diaLancamento: Long): Fatura? {
         val fatura = faturaRepository.findByCartaoIdAndMes(
-            cartao,
-            CustomCalendarView.getMonthDescription(mes.toInt())!!
+            cartaoId,
+            CustomCalendarView.getMonthDescription(mes)!!
         )
         if (fatura != null) {
-            val diaLancamento = lancamento.data!!.split("/")[Constantes.ZERO]
-            if (fatura.diaFechamento!! > diaLancamento.toLong()) {
-                lancamento.faturaId = fatura.id
-            } else {
-                setarFaturaIdProximaFatura(fatura, lancamento)
+            return if (fatura.diaFechamento!! > diaLancamento) fatura
+            else {
+                buscarProximaFatura(fatura)
             }
         }
+        return null
     }
 
-    private fun setarFaturaIdProximaFatura(fatura: Fatura, lancamento: Lancamento) {
+    private fun buscarProximaFatura(fatura: Fatura): Fatura {
         val nextMonth = CustomCalendarView.getNextMonth(fatura.mes!!)
         var proximaFatura =
             faturaRepository.findByCartaoIdAndMes(fatura.cartaoId!!, nextMonth!!)
-        if (proximaFatura != null) lancamento.faturaId = proximaFatura.id!!
-        else {
-            proximaFatura = criarProximaFatura(fatura, nextMonth)
-            lancamento.faturaId = proximaFatura.id!!
-        }
+        if (proximaFatura == null) proximaFatura = criarProximaFatura(fatura, nextMonth)
+        return proximaFatura
     }
 
     private fun criarProximaFatura(
@@ -139,13 +136,29 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         return proximaFatura
     }
 
-    private fun validarCarteira(lancamento: Lancamento) {
+    private fun salvarNaCarteira(lancamento: Lancamento) {
         viewModel.carteiraId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
                 val carteira = carteiraRepository.findById(it)
-                if (carteira != null) lancamento.carteiraId = carteira.id!!
+                if (carteira != null) {
+                    lancamento.carteiraId = carteira.id!!
+                    lancamentoRepository.save(lancamento) {
+                        showMessageAndExit("Lançamento criado na carteira de ${carteira.mes}")
+                    }
+                } else {
+                    showMessageAndExit("A carteira não existe para o código $it")
+                }
             }
         }
+    }
+
+    private fun showMessageAndExit(message: String) {
+        Snackbar.make(
+            this.view!!,
+            message,
+            Snackbar.LENGTH_LONG
+        ).show()
+        navController?.navigateUp()
     }
 
     private fun getLancamento(): Lancamento {

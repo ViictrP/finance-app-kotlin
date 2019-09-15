@@ -85,7 +85,10 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private fun initObservers() {
         cartaoViewModel.cartoes.observe(this, Observer {
             val adapter = this.crCartoes.adapter as CartaoAdapter
-            if (it.size > Constantes.ZERO) onItemChangedListener(Constantes.ZERO)
+            if (it.size > Constantes.ZERO) {
+                this.crCartoes.scrollToPosition(Constantes.ZERO)
+                onItemChangedListener(Constantes.ZERO)
+            }
             adapter.setList(it.toMutableList())
         })
         cartaoViewModel.lancamentos.observe(this, Observer {
