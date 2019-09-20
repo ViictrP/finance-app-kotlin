@@ -94,7 +94,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         }
     }
 
-    override fun onMonthChange(month: Int) {
+    override fun onMonthChange(month: Int, year: Int) {
         val mes = CustomCalendarView.getMonthDescription(month)
         this.loadCarteira(mes!!)
     }

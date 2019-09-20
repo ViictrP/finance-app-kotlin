@@ -206,7 +206,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         val textView = root.findViewById<TextView>(R.id.custom_calendar_tx_month)
         textView.text = months[month]
         this.month = month
-        this.onMonthChangeListener.onMonthChange(month)
+        this.onMonthChangeListener.onMonthChange(month, this.year)
     }
 
     interface OnMonthChangeListener {
@@ -216,6 +216,6 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
          *
          * @param month - mês selecionado
          */
-        fun onMonthChange(month: Int)
+        fun onMonthChange(month: Int, year: Int)
     }
 }

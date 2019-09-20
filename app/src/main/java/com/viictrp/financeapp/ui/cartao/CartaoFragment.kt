@@ -144,7 +144,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                 cartaoViewModel.cartaoSelecionado.postValue(cartao)
                 buscarLancamentosDoMesOuCriarNovaFatura(
                     cartao,
-                    CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1)
+                    CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1),
+                    Calendar.getInstance().get(Calendar.YEAR)
                 )
             }
         }
@@ -152,24 +153,27 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     private fun buscarLancamentosDoMesOuCriarNovaFatura(
         cartao: Cartao,
-        mes: String?
+        mes: String?,
+        ano: Int
     ) {
-        val fatura = faturaRepository.findByCartaoIdAndMesAndAno(cartao.id!!, mes!!)
+        val fatura = faturaRepository.findByCartaoIdAndMesAndAno(cartao.id!!, mes!!, ano)
         if (fatura != null) {
             val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
             cartaoViewModel.lancamentos.postValue(lancamentos)
-        } else criarFaturaNoMes(cartao, mes)
+        } else criarFaturaNoMesAndAno(cartao, mes, ano)
     }
 
-    private fun criarFaturaNoMes(
+    private fun criarFaturaNoMesAndAno(
         cartao: Cartao,
-        mes: String?
+        mes: String?,
+        ano: Int
     ) {
         val fatura = Fatura().apply {
             this.cartaoId = cartao.id
             this.descricao = "Fatura do mês de $mes"
             this.diaFechamento = cartao.dataFechamento
             this.mes = mes
+            this.ano = ano
             this.pago = false
             this.titulo = "Fatura do mês de $mes"
             this.usuarioId = cartao.usuarioId
@@ -192,11 +196,12 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         }
     }
 
-    override fun onMonthChange(month: Int) {
-        cartaoViewModel.cartaoSelecionado.value.let {
-            if (it != null) buscarLancamentosDoMesOuCriarNovaFatura(
-                it,
-                CustomCalendarView.getMonthDescription(month)
+    override fun onMonthChange(month: Int, year: Int) {
+        cartaoViewModel.cartaoSelecionado.value.let { cartao ->
+            if (cartao != null) buscarLancamentosDoMesOuCriarNovaFatura(
+                cartao,
+                CustomCalendarView.getMonthDescription(month),
+                year
             )
         }
     }
