@@ -84,7 +84,13 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
                 val dataArr = lancamento.data!!.split("/")
                 val diaLancamento = dataArr[Constantes.ZERO]
                 val mesLancamento = dataArr[Constantes.UM]
-                val fatura = buscarFatura(it, mesLancamento.toInt(), diaLancamento.toLong())
+                val anoLancamento = dataArr[Constantes.DOIS]
+                val fatura = buscarFatura(
+                    it,
+                    mesLancamento.toInt(),
+                    diaLancamento.toLong(),
+                    anoLancamento.toInt()
+                )
                 if (fatura != null) {
                     lancamento.faturaId = fatura.id
                     lancamentoRepository.save(lancamento) {
@@ -97,10 +103,11 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun buscarFatura(cartaoId: Long, mes: Int, diaLancamento: Long): Fatura? {
-        val fatura = faturaRepository.findByCartaoIdAndMes(
+    private fun buscarFatura(cartaoId: Long, mes: Int, diaLancamento: Long, ano: Int): Fatura? {
+        val fatura = faturaRepository.findByCartaoIdAndMesAndAno(
             cartaoId,
-            CustomCalendarView.getMonthDescription(mes)!!
+            CustomCalendarView.getMonthDescription(mes)!!,
+            ano
         )
         if (fatura != null) {
             return if (fatura.diaFechamento!! > diaLancamento) fatura
@@ -113,21 +120,27 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
 
     private fun buscarProximaFatura(fatura: Fatura): Fatura {
         val nextMonth = CustomCalendarView.getNextMonth(fatura.mes!!)
+        var ano = fatura.ano!!
+        if (CustomCalendarView.JANEIRO == CustomCalendarView.getMonthId(nextMonth!!)) {
+            ano += 1
+        }
         var proximaFatura =
-            faturaRepository.findByCartaoIdAndMes(fatura.cartaoId!!, nextMonth!!)
-        if (proximaFatura == null) proximaFatura = criarProximaFatura(fatura, nextMonth)
+            faturaRepository.findByCartaoIdAndMesAndAno(fatura.cartaoId!!, nextMonth, ano)
+        if (proximaFatura == null) proximaFatura = criarProximaFatura(fatura, nextMonth, ano)
         return proximaFatura
     }
 
     private fun criarProximaFatura(
         fatura: Fatura,
-        nextMonth: String?
+        nextMonth: String?,
+        ano: Int
     ): Fatura {
         val proximaFatura = Fatura().apply {
             this.usuarioId = fatura.usuarioId
             this.titulo = "Fatura do mês de $nextMonth"
             this.pago = false
             this.mes = nextMonth
+            this.ano = ano
             this.diaFechamento = fatura.diaFechamento
             this.descricao = "Fatura do mês de $nextMonth"
             this.cartaoId = fatura.cartaoId

@@ -10,6 +10,7 @@
     <string name="placeholder">placeholder</string>
     <string name="money_placeholder">10000</string>
     <string name="month_placeholder">AGOSTO</string>
+    <string name="year_placeholder">2019</string>
     <string name="descricao_placeholder">descrição</string>
     <string name="diafechamento_placeholder">dia de fechamento</string>
     <string name="limite_placeholder">limite</string>

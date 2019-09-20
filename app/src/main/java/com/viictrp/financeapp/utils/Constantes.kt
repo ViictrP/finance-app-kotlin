@@ -17,6 +17,7 @@ class Constantes {
         // Realm
         val ID = "id"
         val MES = "mes"
+        val ANO = "ano"
         val CARTEIRA_ID = "carteiraId"
         val FATURA_ID = "faturaId"
         val USUARIO_ID = "usuarioId"

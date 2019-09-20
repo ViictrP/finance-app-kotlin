@@ -19,5 +19,6 @@ open class Fatura(titulo: String? = null,
     var pago: Boolean? = pago
     var cartaoId: Long? = null
     var mes: String? = mes
+    var ano: Int? = null
     var diaFechamento: Long? = diaFechamento
 }

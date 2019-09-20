@@ -154,7 +154,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         cartao: Cartao,
         mes: String?
     ) {
-        val fatura = faturaRepository.findByCartaoIdAndMes(cartao.id!!, mes!!)
+        val fatura = faturaRepository.findByCartaoIdAndMesAndAno(cartao.id!!, mes!!)
         if (fatura != null) {
             val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
             cartaoViewModel.lancamentos.postValue(lancamentos)

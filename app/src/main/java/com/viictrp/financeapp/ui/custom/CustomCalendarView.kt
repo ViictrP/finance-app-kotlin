@@ -78,7 +78,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         }
 
         fun getNextMonth(month: String): String? {
-            val monthId = CustomCalendarView.getMonthId(month)
+            val monthId = getMonthId(month)
             return if (monthId == DEZEMBRO) {
                 getMonthDescription(JANEIRO)
             } else {
@@ -107,6 +107,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
 
 
     private var month: Int = Calendar.getInstance().get(Calendar.MONTH)
+    private var year: Int = Calendar.getInstance().get(Calendar.YEAR)
     private var root: View = LayoutInflater.from(context)
         .inflate(R.layout.custom_calendar_layout, this, true)
 
@@ -130,6 +131,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         root.findViewById<ImageButton>(R.id.previous_month).setOnClickListener(this)
         root.findViewById<ImageButton>(R.id.next_month).setOnClickListener(this)
         root.findViewById<TextView>(R.id.custom_calendar_tx_month).text = getMonthDescription(month)
+        root.findViewById<TextView>(R.id.custom_calendar_tx_year).text = this.year.toString()
     }
 
     /**
@@ -149,6 +151,15 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
     }
 
     /**
+     * Seta o ano
+     */
+    fun setYear(year: Int) {
+        val textView = root.findViewById<TextView>(R.id.custom_calendar_tx_year)
+        textView.text = year.toString()
+        this.year = year
+    }
+
+    /**
      * OnClick dos botões
      */
     override fun onClick(button: View?) {
@@ -165,6 +176,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
      */
     private fun onPreviousMonthChange() {
         if (month == JANEIRO) {
+            this.setYear(this.year -1)
             this.monthChanged(DEZEMBRO)
         } else {
             val previous = month - 1
@@ -177,6 +189,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
      */
     private fun onNextMonthChange() {
         if (month == DEZEMBRO) {
+            this.setYear(this.year + 1)
             this.monthChanged(JANEIRO)
         } else {
             val next = month + 1

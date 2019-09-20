@@ -8,11 +8,12 @@ import io.realm.kotlin.where
 
 class FaturaRepository(private var context: Context) {
 
-    fun findByCartaoIdAndMes(cartaoId: Long, mes: String): Fatura? {
+    fun findByCartaoIdAndMesAndAno(cartaoId: Long, mes: String, ano: Int): Fatura? {
         val realm = RealmInitializer.getInstance(context)
         val managedObject = realm.where<Fatura>()
             .equalTo(Constantes.CARTAO_ID, cartaoId).and()
-            .equalTo(Constantes.MES, mes)
+            .equalTo(Constantes.MES, mes).and()
+            .equalTo(Constantes.ANO, ano)
             .findFirst()
         return if (managedObject != null) realm.copyFromRealm(managedObject)
         else null

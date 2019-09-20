@@ -10,5 +10,6 @@ open class Carteira(mes: String? = null): RealmModel {
     @PrimaryKey
     var id: Long? = null
     var mes: String? = mes
+    var ano: Int? = null
     var usuarioId: Long? = null
 }
