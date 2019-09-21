@@ -65,7 +65,7 @@
                     android:layout_height="100dp"
                     android:layout_weight="1"
                     android:background="@drawable/ripple"
-                    android:drawableTop="@drawable/ic_payment_method_24"
+                    android:drawableTop="@drawable/ic_check_solid_24"
                     android:paddingTop="20dp"
                     android:text="@string/title_cartao_pagar"
                     android:textAlignment="center"
