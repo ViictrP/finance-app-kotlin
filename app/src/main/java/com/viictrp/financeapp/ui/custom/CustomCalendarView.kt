@@ -6,9 +6,12 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorListener
 import com.viictrp.financeapp.R
 import java.util.*
 
@@ -176,7 +179,12 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
      */
     private fun onPreviousMonthChange() {
         if (month == JANEIRO) {
-            this.setYear(this.year -1)
+            val textView = root.findViewById<TextView>(R.id.custom_calendar_tx_year)
+            val originalPosition = textView.translationX
+            animate(textView, -1000f, 100) {
+                setYear(year - 1)
+                animate(textView, originalPosition, 100L) {}
+            }
             this.monthChanged(DEZEMBRO)
         } else {
             val previous = month - 1
@@ -184,12 +192,32 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         }
     }
 
+    private fun animate(view: View, toPosition: Float, duration: Long, finished: () -> Unit) {
+        ViewCompat.animate(view)
+            .translationX(toPosition)
+            .setDuration(duration)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .setListener(object : ViewPropertyAnimatorListener {
+                override fun onAnimationStart(view: View?) {}
+                override fun onAnimationCancel(view: View?) {}
+                override fun onAnimationEnd(view: View?) {
+                    finished()
+                }
+            })
+            .startDelay = 50
+    }
+
     /**
      * Executado quando o botão próximo for executado
      */
     private fun onNextMonthChange() {
         if (month == DEZEMBRO) {
-            this.setYear(this.year + 1)
+            val textView = root.findViewById<TextView>(R.id.custom_calendar_tx_year)
+            val originalPosition = textView.translationX
+            animate(textView, 1000f, 100) {
+                setYear(this.year + 1)
+                animate(textView, originalPosition, 100L) {}
+            }
             this.monthChanged(JANEIRO)
         } else {
             val next = month + 1
