@@ -6,6 +6,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -29,6 +30,7 @@ import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
+import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
 import com.viictrp.financeapp.utils.CarouselBuilder
 import com.viictrp.financeapp.utils.Constantes
@@ -50,6 +52,10 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var cartaoRepository: CartaoRepository
     private lateinit var faturaRepository: FaturaRepository
 
+    // Screen components
+    private lateinit var txCartaoValorFatura: RialTextView
+    private lateinit var txCartaoDescricao: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -67,6 +73,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             R.drawable.ic_credit_card_with_plus_sign_24,
             this
         )
+        this.txCartaoValorFatura = view.findViewById(R.id.tx_valor_fatura)
+        this.txCartaoDescricao = view.findViewById(R.id.tx_descricao_cartao)
         cartaoViewModel = ViewModelProviders.of(this).get(CartaoViewModel::class.java)
         initChildren(view)
         initObservers()
@@ -91,9 +99,20 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             }
             adapter.setList(it.toMutableList())
         })
+
         cartaoViewModel.lancamentos.observe(this, Observer {
+            if (it.isNotEmpty()) {
+                val valor = it.map { lancamento -> lancamento.valor!! }.reduce {soma, next -> soma + next}
+                this.txCartaoValorFatura.text = valor.toString()
+            } else {
+                this.txCartaoValorFatura.text = "0,00"
+            }
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
+        })
+
+        cartaoViewModel.cartaoSelecionado.observe(this, Observer {
+            this.txCartaoDescricao.text = it.descricao
         })
     }
 

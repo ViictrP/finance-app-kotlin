@@ -18,7 +18,7 @@
     <string name="ultimosdigitos_placeholder">1234</string>
     <string name="titulo_placeholder">título</string>
     <string name="valor_placeholder">R$0,00</string>
-    <string name="quantidade_parcelas_placeholder">1</string>
+    <string name="quantidade_parcelas_placeholder">quantidade de parcelas</string>
     <string name="data_placeholder">dia/mes/ano</string>
     <string name="orcamento_placeholder">0,00</string>
     <string name="gerenciar_orcamento">Alterar orçamento</string>
@@ -34,6 +34,7 @@
     <string name="bandeira_placeholder">VISA</string>
     <string name="fechamento">fechamento dia</string>
     <string name="underline_placeholder">__</string>
+    <string name="numero_cartao_placeholder">últimos dígitos do cartão</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

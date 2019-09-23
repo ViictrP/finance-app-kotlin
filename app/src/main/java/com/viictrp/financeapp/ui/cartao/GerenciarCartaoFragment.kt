@@ -19,6 +19,7 @@ import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.model.Cartao
 import com.viictrp.financeapp.repository.CartaoRepository
+import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.ui.custom.RialTextView
 
 class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
@@ -38,7 +39,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
     private lateinit var etDescricaoNovoCartao: EditText
     private lateinit var etDiaFechamento: EditText
     private lateinit var etBandeiraNovoCartao: EditText
-    private lateinit var etLimite: EditText
+    private lateinit var etLimite: CurrencyEditText
     private lateinit var etUltimosDigitos: EditText
 
     private lateinit var viewModel: GerenciarCartaoViewModel
@@ -144,7 +145,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
         return Cartao().apply {
             this.descricao = etDescricaoNovoCartao.text.toString()
             this.dataFechamento = etDiaFechamento.text.toString().toLong()
-            this.limite = etLimite.text.toString().toDouble()
+            this.limite = etLimite.currencyDouble
             this.bandeira = etBandeiraNovoCartao.text.toString()
             this.numeroCartao = etUltimosDigitos.text.toString()
             this.usuarioId = 1L

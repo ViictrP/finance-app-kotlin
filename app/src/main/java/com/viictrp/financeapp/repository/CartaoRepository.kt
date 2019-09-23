@@ -27,4 +27,12 @@ class CartaoRepository(private var context: Context) {
             finish(cartao)
         }
     }
+
+    fun findById(cartaoId: Long): Cartao? {
+        val realm = RealmInitializer.getInstance(context)
+        val managedObject = realm.where<Cartao>().equalTo(Constantes.ID, cartaoId)
+            .findFirst()
+        return if (managedObject != null) realm.copyFromRealm(managedObject)
+        else null
+    }
 }

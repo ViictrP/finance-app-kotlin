@@ -8,6 +8,7 @@ class Constantes {
         val ZERO_LONG = 0L
         val UM = 1
         val DOIS = 2
+        val DEZ = 10
 
         val ORCAMENTO_ID_KEY = "orcamentoId"
         val CARTEIRA_ID_KEY = "carteiraId"

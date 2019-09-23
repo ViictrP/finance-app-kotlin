@@ -1,11 +1,13 @@
 package com.viictrp.financeapp.ui.lancamento
 
 import android.app.DatePickerDialog
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -17,6 +19,7 @@ import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.model.Lancamento
+import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.CarteiraRepository
 import com.viictrp.financeapp.repository.FaturaRepository
 import com.viictrp.financeapp.repository.LancamentoRepository
@@ -25,6 +28,9 @@ import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import java.util.*
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class LancamentoFragment : Fragment(), View.OnClickListener {
 
@@ -43,6 +49,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private lateinit var lancamentoRepository: LancamentoRepository
     private lateinit var carteiraRepository: CarteiraRepository
     private lateinit var faturaRepository: FaturaRepository
+    private lateinit var cartaoRepository: CartaoRepository
 
     private var calendar = Calendar.getInstance()
 
@@ -61,6 +68,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         this.lancamentoRepository = LancamentoRepository(this.context!!)
         this.carteiraRepository = CarteiraRepository(this.context!!)
         this.faturaRepository = FaturaRepository(this.context!!)
+        this.cartaoRepository = CartaoRepository(this.context!!)
         bindEditTexts(view)
         bindObservers()
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
@@ -68,9 +76,43 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         viewModel.cartaoId.postValue(arguments?.getLong(Constantes.CARTAO_ID_KEY))
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(view: View?) {
         val lancamento = getLancamento()
-        salvarNaCarteiraOuFatura(lancamento)
+        if (lancamento.quantidadeParcelas > Constantes.UM) {
+            val lancamentos = clonar(lancamento, lancamento.quantidadeParcelas)
+            lancamentos.forEach {
+                salvarNaCarteiraOuFatura(it)
+            }
+        } else salvarNaCarteiraOuFatura(lancamento)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun clonar(lancamento: Lancamento, quantidadeParcelas: Int): List<Lancamento> {
+        val descricao = lancamento.descricao
+        lancamento.descricao = "${lancamento.descricao} ${Constantes.UM}/$quantidadeParcelas"
+        val list = mutableListOf(lancamento)
+        val parcelasId = UUID.randomUUID().toString().substring(Constantes.ZERO, Constantes.DEZ)
+        lancamento.parcelaId = parcelasId
+        val myFormat = "dd/MM/yyyy" //In which you need put here
+        val sdf = SimpleDateFormat(myFormat, Locale("pt", "BR"))
+        val dataInicial = sdf.parse(lancamento.data!!)
+        val calendar = Calendar.getInstance()
+        calendar.time = dataInicial!!
+        for (i in Constantes.UM until quantidadeParcelas) {
+            calendar.add(Calendar.MONTH, Constantes.UM)
+            list.add(Lancamento().apply {
+                this.titulo = lancamento.titulo
+                this.descricao =
+                    "$descricao ${(i + Constantes.UM)}/$quantidadeParcelas"
+                this.valor = lancamento.valor
+                this.data = sdf.format(calendar.time)
+                this.quantidadeParcelas = lancamento.quantidadeParcelas
+                this.parcelaId = parcelasId
+                this.numeroParcela = i
+            })
+        }
+        return list
     }
 
     private fun salvarNaCarteiraOuFatura(lancamento: Lancamento) {
@@ -97,7 +139,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
                         showMessageAndExit("Lançamento criado na fatura de ${fatura.mes}")
                     }
                 } else {
-                    showMessageAndExit("A fatura não existe")
+                    showMessageAndExit("A fatura não existe para data ${lancamento.data}")
                 }
             }
         }
@@ -114,8 +156,21 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
             else {
                 buscarProximaFatura(fatura)
             }
+        } else {
+            val cartao = cartaoRepository.findById(cartaoId)
+            val novaFatura = Fatura().apply {
+                this.cartaoId = cartaoId
+                this.mes = CustomCalendarView.getMonthDescription(mes)
+                this.ano = ano
+                this.diaFechamento = cartao!!.dataFechamento
+                this.descricao = "Fatura do mês de ${this.mes}"
+                this.pago = false
+                this.titulo = this.descricao
+                this.usuarioId = Constantes.SYSTEM_USER
+            }
+            faturaRepository.save(novaFatura)
+            return novaFatura
         }
-        return null
     }
 
     private fun buscarProximaFatura(fatura: Fatura): Fatura {

@@ -18,7 +18,9 @@ open class Lancamento(titulo: String? = null,
     var valor: Double? = valor
     var quantidadeParcelas: Int = 1
     var categoriaId: Long? = null
+    var parcelaId: String? = null
     var carteiraId: Long? = null
     var faturaId: Long? = null
+    var numeroParcela: Int = 1
 
 }

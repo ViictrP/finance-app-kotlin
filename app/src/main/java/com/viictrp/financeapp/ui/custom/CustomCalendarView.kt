@@ -94,6 +94,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
                 "JANEIRO" -> return JANEIRO
                 "FEVEREIRO" -> return FEVEREIRO
                 "MARCO" -> return MARCO
+                "MARÇO" -> return MARCO
                 "ABRIL" -> return ABRIL
                 "MAIO" -> return MAIO
                 "JUNHO" -> return JUNHO
@@ -184,8 +185,8 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
             animate(textView, -1000f, 100) {
                 setYear(year - 1)
                 animate(textView, originalPosition, 100L) {}
+                this.monthChanged(DEZEMBRO)
             }
-            this.monthChanged(DEZEMBRO)
         } else {
             val previous = month - 1
             this.monthChanged(previous)
@@ -217,8 +218,8 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
             animate(textView, 1000f, 100) {
                 setYear(this.year + 1)
                 animate(textView, originalPosition, 100L) {}
+                this.monthChanged(JANEIRO)
             }
-            this.monthChanged(JANEIRO)
         } else {
             val next = month + 1
             this.monthChanged(next)
@@ -234,7 +235,7 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         val textView = root.findViewById<TextView>(R.id.custom_calendar_tx_month)
         textView.text = months[month]
         this.month = month
-        this.onMonthChangeListener.onMonthChange(month, this.year)
+        this.onMonthChangeListener.onMonthChange(month, year)
     }
 
     interface OnMonthChangeListener {

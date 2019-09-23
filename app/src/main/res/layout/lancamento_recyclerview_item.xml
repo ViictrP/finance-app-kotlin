@@ -33,7 +33,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="10dp"
             android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_money_bag_with_dollar_symbol_24"
+            android:src="@drawable/ic_shopping_cart_24"
             android:tint="@color/navigationTint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -47,6 +47,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private lateinit var rvLancamentos: RecyclerView
     private lateinit var pbOrcamento: ProgressBar
     private lateinit var calendarView: CustomCalendarView
+    private lateinit var txValorDisponivel: RialTextView
 
     private lateinit var lancamentoRepository: LancamentoRepository
     private lateinit var carteiraRepository: CarteiraRepository
@@ -69,6 +70,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         this.pbOrcamento = view.findViewById(R.id.pb_orcamento)
         this.txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
         this.txGastoAteMomento = view.findViewById(R.id.tx_gasto_ate_momento)
+        this.txValorDisponivel = view.findViewById(R.id.tx_valor_disponivel)
         this.calendarView = view.findViewById(R.id.calendarView_carteira)
         this.calendarView.setOnMonthChangeListener(this)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
@@ -112,6 +114,13 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         carteiraViewModel.lancamentos.observe(this, Observer {
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
+            if (it.isNotEmpty()) {
+                carteiraViewModel.orcamento.value.let { orcamento ->
+                    val valorLancamentos =
+                        it.map { lancamento -> lancamento.valor!! }.reduce { soma, lanc -> soma + lanc }
+                    txValorDisponivel.text = "${orcamento!!.valor!! - valorLancamentos}"
+                }
+            }
         })
 
         carteiraViewModel.progressBarProgress.observe(this, Observer {

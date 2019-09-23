@@ -214,7 +214,7 @@
             android:textCursorDrawable="@drawable/edit_text_cursor"
             android:textSize="22sp" />
 
-        <EditText
+        <com.viictrp.financeapp.ui.custom.CurrencyEditText
             android:id="@+id/et_limite"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -231,19 +231,21 @@
             android:paddingEnd="20dp"
             android:paddingBottom="10dp"
             android:textCursorDrawable="@drawable/edit_text_cursor"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            app:groupDivider="."
+            app:monetaryDivider="," />
 
         <EditText
             android:id="@+id/et_ultimos_digitos"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="5dp"
-            android:autofillHints="@string/ultimosdigitos_placeholder"
+            android:autofillHints="@string/numero_cartao_placeholder"
             android:background="@drawable/rounded_edittext"
             android:drawableStart="@drawable/ic_credit_card_solid_24"
             android:drawablePadding="20dp"
             android:drawableTint="@color/navigationTint"
-            android:hint="@string/ultimosdigitos_placeholder"
+            android:hint="@string/numero_cartao_placeholder"
             android:inputType="number"
             android:paddingStart="20dp"
             android:paddingTop="10dp"
