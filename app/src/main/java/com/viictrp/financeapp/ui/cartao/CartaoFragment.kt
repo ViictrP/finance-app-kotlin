@@ -21,11 +21,11 @@ import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
+import com.viictrp.financeapp.domain.CartaoDomain
+import com.viictrp.financeapp.domain.FaturaDomain
 import com.viictrp.financeapp.model.Cartao
 import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.model.Lancamento
-import com.viictrp.financeapp.repository.CartaoRepository
-import com.viictrp.financeapp.repository.FaturaRepository
 import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
@@ -49,8 +49,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     // Repositories
     private lateinit var lancamentoRepository: LancamentoRepository
-    private lateinit var cartaoRepository: CartaoRepository
-    private lateinit var faturaRepository: FaturaRepository
+    private lateinit var cartaoDomain: CartaoDomain
+    private lateinit var faturaDomain: FaturaDomain
 
     // Screen components
     private lateinit var txCartaoValorFatura: RialTextView
@@ -85,8 +85,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
         this.calendarView.setMonth(monthId)
         this.lancamentoRepository = LancamentoRepository(this.context!!)
-        this.cartaoRepository = CartaoRepository(this.context!!)
-        this.faturaRepository = FaturaRepository(this.context!!)
+        this.cartaoDomain = CartaoDomain(this.context!!)
+        this.faturaDomain = FaturaDomain(this.context!!)
         loadCartoes()
     }
 
@@ -102,10 +102,11 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
         cartaoViewModel.lancamentos.observe(this, Observer {
             if (it.isNotEmpty()) {
-                val valor = it.map { lancamento -> lancamento.valor!! }.reduce {soma, next -> soma + next}
+                val valor =
+                    it.map { lancamento -> lancamento.valor!! }.reduce { soma, next -> soma + next }
                 this.txCartaoValorFatura.text = valor.toString()
             } else {
-                this.txCartaoValorFatura.text = "0,00"
+                this.txCartaoValorFatura.text = R.string.orcamento_placeholder.toString()
             }
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
@@ -143,7 +144,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun loadCartoes() {
-        val cartoes = cartaoRepository.findCartaoByUsuarioId(Constantes.SYSTEM_USER)
+        val cartoes = cartaoDomain.findCartaoByUsuarioId(Constantes.SYSTEM_USER)
         cartaoViewModel.cartoes.postValue(cartoes)
     }
 
@@ -161,43 +162,19 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             it.let { cartoes ->
                 val cartao = cartoes!![position]
                 cartaoViewModel.cartaoSelecionado.postValue(cartao)
-                buscarLancamentosDoMesOuCriarNovaFatura(
-                    cartao,
-                    CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1),
-                    Calendar.getInstance().get(Calendar.YEAR)
-                )
+                buscarLancamentosCartao(cartao)
             }
         }
     }
 
-    private fun buscarLancamentosDoMesOuCriarNovaFatura(
-        cartao: Cartao,
-        mes: String?,
-        ano: Int
-    ) {
-        val fatura = faturaRepository.findByCartaoIdAndMesAndAno(cartao.id!!, mes!!, ano)
-        if (fatura != null) {
-            val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
-            cartaoViewModel.lancamentos.postValue(lancamentos)
-        } else criarFaturaNoMesAndAno(cartao, mes, ano)
-    }
-
-    private fun criarFaturaNoMesAndAno(
-        cartao: Cartao,
-        mes: String?,
-        ano: Int
-    ) {
-        val fatura = Fatura().apply {
-            this.cartaoId = cartao.id
-            this.descricao = "Fatura do mês de $mes"
-            this.diaFechamento = cartao.dataFechamento
-            this.mes = mes
-            this.ano = ano
-            this.pago = false
-            this.titulo = "Fatura do mês de $mes"
-            this.usuarioId = cartao.usuarioId
-        }
-        faturaRepository.save(fatura)
+    private fun buscarLancamentosCartao(cartaoId: Long) {
+        val fatura = faturaDomain.findByCartaoIdAndMesAndAno(
+            cartao.id!!,
+            CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1)!!,
+            Calendar.getInstance().get(Calendar.YEAR)
+        )
+        val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
+        cartaoViewModel.lancamentos.postValue(lancamentos)
     }
 
     override fun onClick(button: View?) {
