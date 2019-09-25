@@ -5,7 +5,7 @@ import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.FaturaRepository
 
-class FaturaDomain(private var context: Context) {
+class FaturaDomain(context: Context) {
 
     private val repository = FaturaRepository(context)
     private val cartaoRepository = CartaoRepository(context)

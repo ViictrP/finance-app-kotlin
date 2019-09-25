@@ -162,19 +162,21 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             it.let { cartoes ->
                 val cartao = cartoes!![position]
                 cartaoViewModel.cartaoSelecionado.postValue(cartao)
-                buscarLancamentosCartao(cartao)
+                buscarLancamentosCartao(cartao.id!!)
             }
         }
     }
 
     private fun buscarLancamentosCartao(cartaoId: Long) {
         val fatura = faturaDomain.findByCartaoIdAndMesAndAno(
-            cartao.id!!,
+            cartaoId,
             CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1)!!,
             Calendar.getInstance().get(Calendar.YEAR)
         )
-        val lancamentos = lancamentoRepository.findLancamentosByFaturaId(fatura.id!!)
-        cartaoViewModel.lancamentos.postValue(lancamentos)
+        fatura.let {
+            val lancamentos = lancamentoRepository.findLancamentosByFaturaId(it!!.id!!)
+            cartaoViewModel.lancamentos.postValue(lancamentos)
+        }
     }
 
     override fun onClick(button: View?) {
@@ -194,11 +196,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     override fun onMonthChange(month: Int, year: Int) {
         cartaoViewModel.cartaoSelecionado.value.let { cartao ->
-            if (cartao != null) buscarLancamentosDoMesOuCriarNovaFatura(
-                cartao,
-                CustomCalendarView.getMonthDescription(month),
-                year
-            )
+            if (cartao != null) buscarLancamentosCartao(cartao.id!!)
         }
     }
 }
