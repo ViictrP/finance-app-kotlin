@@ -29,7 +29,7 @@ class CartaoDomain(private var context: Context) {
             Calendar.getInstance().get(Calendar.YEAR)
         )
         fatura.let {
-            val lancamentos = lancamentoRepository.findLancamentosByFaturaId(it!!.id!!)
+            val lancamentos = faturaDomain.findLancamentosByFaturaId(it!!.id!!)
             cartaoViewModel.lancamentos.postValue(lancamentos)
         }
         return listOf()

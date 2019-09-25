@@ -47,7 +47,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var calendarView: CustomCalendarView
     private lateinit var rvLancamentos: RecyclerView
 
-    // Repositories
+    // Domains
     private lateinit var lancamentoRepository: LancamentoRepository
     private lateinit var cartaoDomain: CartaoDomain
     private lateinit var faturaDomain: FaturaDomain
@@ -119,13 +119,13 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     private fun initChildren(root: View) {
         root.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
-        this.crCartoes = CarouselBuilder()
-            .convertToCarousel(root.findViewById(R.id.cr_cartoes), this.context!!, this)
-            .withDecoration(CirclePagerIndicatorDecoration())
-            .build()
-        this.crCartoes.adapter = CartaoAdapter(mutableListOf(), this.context!!)
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
         this.calendarView.setOnMonthChangeListener(this)
+        buildCrCartoes(root)
+        buildRVLancamentos(root)
+    }
+
+    private fun buildRVLancamentos(root: View) {
         this.rvLancamentos = root.findViewById(R.id.rv_lancamentos_cartoes)
         this.rvLancamentos.adapter = LancamentoAdapter(mutableListOf(), this.context!!)
         this.rvLancamentos.layoutManager = LinearLayoutManager(this.context!!)
@@ -141,6 +141,14 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(rvLancamentos)
+    }
+
+    private fun buildCrCartoes(root: View) {
+        this.crCartoes = CarouselBuilder()
+            .convertToCarousel(root.findViewById(R.id.cr_cartoes), this.context!!, this)
+            .withDecoration(CirclePagerIndicatorDecoration())
+            .build()
+        this.crCartoes.adapter = CartaoAdapter(mutableListOf(), this.context!!)
     }
 
     private fun loadCartoes() {
@@ -186,9 +194,6 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             )
             R.id.btn_novo_lancamento -> navController.navigate(
                 R.id.action_navegacao_cartao_to_lancamentoFragment,
-                // TODO passar o ID do cartão para criar novo lançamento
-                // o ID da fatura não será necessário pois buscará a fatura do mês do lançamento
-                // para execução da lógica de cadastro
                 bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
             )
         }
