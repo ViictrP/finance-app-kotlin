@@ -13,7 +13,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -23,8 +22,6 @@ import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.domain.CartaoDomain
 import com.viictrp.financeapp.domain.FaturaDomain
-import com.viictrp.financeapp.model.Cartao
-import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
@@ -32,10 +29,7 @@ import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
-import com.viictrp.financeapp.utils.CarouselBuilder
-import com.viictrp.financeapp.utils.Constantes
-import com.viictrp.financeapp.utils.StatusBarTheme
-import com.viictrp.financeapp.utils.SwipeToDeleteCallback
+import com.viictrp.financeapp.utils.*
 import java.util.*
 import kotlin.math.absoluteValue
 
@@ -44,9 +38,6 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var navController: NavController
 
     private lateinit var cartaoViewModel: CartaoViewModel
-    private lateinit var crCartoes: RecyclerView
-    private lateinit var calendarView: CustomCalendarView
-    private lateinit var rvLancamentos: RecyclerView
 
     // Domains
     private lateinit var lancamentoRepository: LancamentoRepository
@@ -54,6 +45,9 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var faturaDomain: FaturaDomain
 
     // Screen components
+    private lateinit var crCartoes: RecyclerView
+    private lateinit var calendarView: CustomCalendarView
+    private lateinit var rvLancamentos: RecyclerView
     private lateinit var txCartaoValorFatura: RialTextView
     private lateinit var txCartaoDescricao: TextView
 
@@ -80,6 +74,40 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         initChildren(view)
         initObservers()
         init()
+    }
+
+    override fun onItemChangedListener(position: Int) {
+        cartaoViewModel.cartoes.value.let {
+            it.let { cartoes ->
+                val cartao = cartoes!![position]
+                cartaoViewModel.cartaoSelecionado.postValue(cartao)
+                buscarLancamentosCartao(
+                    cartao.id!!,
+                    cartaoViewModel.mesSelecionado.value!!,
+                    cartaoViewModel.anoSelecionado.value!!
+                )
+            }
+        }
+    }
+
+    override fun onClick(button: View?) {
+        when (button!!.id) {
+            R.id.action_bar_button -> navController.navigate(
+                R.id.action_navegacao_cartao_to_gerenciarCartao
+            )
+            R.id.btn_novo_lancamento -> navController.navigate(
+                R.id.action_navegacao_cartao_to_lancamentoFragment,
+                bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
+            )
+        }
+    }
+
+    override fun onMonthChange(month: Int, year: Int) {
+        cartaoViewModel.cartaoSelecionado.value.let { cartao ->
+            if (cartao != null) buscarLancamentosCartao(cartao.id!!, month, year)
+            cartaoViewModel.mesSelecionado.postValue(month)
+            cartaoViewModel.anoSelecionado.postValue(year)
+        }
     }
 
     private fun init() {
@@ -109,7 +137,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                     it.map { lancamento -> lancamento.valor!! }.reduce { soma, next -> soma + next }
                 this.txCartaoValorFatura.text = valor.toString()
             } else {
-                this.txCartaoValorFatura.text = R.string.orcamento_placeholder.absoluteValue.toString()
+                this.txCartaoValorFatura.text =
+                    R.string.orcamento_placeholder.absoluteValue.toString()
             }
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
@@ -128,32 +157,6 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         buildRVLancamentos(root)
     }
 
-    private fun buildRVLancamentos(root: View) {
-        this.rvLancamentos = root.findViewById(R.id.rv_lancamentos_cartoes)
-        this.rvLancamentos.adapter = LancamentoAdapter(mutableListOf(), this.context!!)
-        this.rvLancamentos.layoutManager = LinearLayoutManager(this.context!!)
-        val swipeHandler = object : SwipeToDeleteCallback(this.context!!) {
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val adapter = (rvLancamentos.adapter as LancamentoAdapter)
-                val lancamento = adapter.getList()!![position]
-                deleteLancamento(lancamento)
-                adapter.removeAt(position)
-            }
-        }
-
-        val itemTouchHelper = ItemTouchHelper(swipeHandler)
-        itemTouchHelper.attachToRecyclerView(rvLancamentos)
-    }
-
-    private fun buildCrCartoes(root: View) {
-        this.crCartoes = CarouselBuilder()
-            .convertToCarousel(root.findViewById(R.id.cr_cartoes), this.context!!, this)
-            .withDecoration(CirclePagerIndicatorDecoration())
-            .build()
-        this.crCartoes.adapter = CartaoAdapter(mutableListOf(), this.context!!)
-    }
-
     private fun loadCartoes() {
         val cartoes = cartaoDomain.findCartaoByUsuarioId(Constantes.SYSTEM_USER)
         cartaoViewModel.cartoes.postValue(cartoes)
@@ -168,41 +171,33 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         ).show()
     }
 
-    override fun onItemChangedListener(position: Int) {
-        cartaoViewModel.cartoes.value.let {
-            it.let { cartoes ->
-                val cartao = cartoes!![position]
-                cartaoViewModel.cartaoSelecionado.postValue(cartao)
-                buscarLancamentosCartao(
-                    cartao.id!!,
-                    cartaoViewModel.mesSelecionado.value!!,
-                    cartaoViewModel.anoSelecionado.value!!
-                )
-            }
-        }
+    private fun buildRVLancamentos(root: View) {
+        this.rvLancamentos = RecyclerViewBuilder()
+            .forRecyclerView(root.findViewById(R.id.rv_lancamentos_cartoes))
+            .withLayoutManager(LinearLayoutManager(this.context!!))
+            .withAdapter(LancamentoAdapter(mutableListOf(), this.context!!))
+            .withSwipeHandler(
+                object : SwipeToDeleteCallback(this.context!!) {
+                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                        val position = viewHolder.adapterPosition
+                        val adapter = (rvLancamentos.adapter as LancamentoAdapter)
+                        val lancamento = adapter.getList()!![position]
+                        deleteLancamento(lancamento)
+                        adapter.removeAt(position)
+                    }
+                }
+            ).build()
+    }
+
+    private fun buildCrCartoes(root: View) {
+        this.crCartoes = CarouselBuilder()
+            .convertToCarousel(root.findViewById(R.id.cr_cartoes), this.context!!, this)
+            .withDecoration(CirclePagerIndicatorDecoration())
+            .withAdapter(CartaoAdapter(mutableListOf(), this.context!!))
+            .build()
     }
 
     private fun buscarLancamentosCartao(cartaoId: Long, mes: Int, ano: Int) {
         cartaoViewModel.lancamentos.postValue(cartaoDomain.findLancamentos(cartaoId, mes, ano))
-    }
-
-    override fun onClick(button: View?) {
-        when (button!!.id) {
-            R.id.action_bar_button -> navController.navigate(
-                R.id.action_navegacao_cartao_to_gerenciarCartao
-            )
-            R.id.btn_novo_lancamento -> navController.navigate(
-                R.id.action_navegacao_cartao_to_lancamentoFragment,
-                bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
-            )
-        }
-    }
-
-    override fun onMonthChange(month: Int, year: Int) {
-        cartaoViewModel.cartaoSelecionado.value.let { cartao ->
-            if (cartao != null) buscarLancamentosCartao(cartao.id!!, month, year)
-            cartaoViewModel.mesSelecionado.postValue(month)
-            cartaoViewModel.anoSelecionado.postValue(year)
-        }
     }
 }

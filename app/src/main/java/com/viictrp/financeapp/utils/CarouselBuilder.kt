@@ -32,6 +32,11 @@ class CarouselBuilder {
         return this
     }
 
+    fun <T : RecyclerView.ViewHolder> withAdapter(adapter: RecyclerView.Adapter<T>): CarouselBuilder {
+        this.rv.adapter = adapter
+        return this
+    }
+
     fun build(): RecyclerView {
         val mSnapHelper = LinearSnapHelper()
         mSnapHelper.attachToRecyclerView(this.rv)
