@@ -19,7 +19,6 @@ import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.domain.CartaoDomain
 import com.viictrp.financeapp.model.Cartao
-import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.ui.custom.RialTextView
 
@@ -132,7 +131,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(button: View?) {
         val cartao = getCartao()
-        this.cartaoDomain.save(cartao) {
+        this.cartaoDomain.salvar(cartao) {
             Snackbar.make(
                 this.view!!,
                 "Cartão ${cartao.descricao} criado com sucesso.",

@@ -24,11 +24,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
+import com.viictrp.financeapp.domain.CarteiraDomain
+import com.viictrp.financeapp.domain.LancamentoDomain
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.repository.CarteiraRepository
-import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
@@ -49,8 +50,8 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private lateinit var calendarView: CustomCalendarView
     private lateinit var txValorDisponivel: RialTextView
 
-    private lateinit var lancamentoRepository: LancamentoRepository
-    private lateinit var carteiraRepository: CarteiraRepository
+    private lateinit var lancamentoDomain: LancamentoDomain
+    private lateinit var carteiraDomain: CarteiraDomain
     private lateinit var orcamentoRepository: OrcamentoRepository
 
     override fun onCreateView(
@@ -97,8 +98,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     }
 
     override fun onMonthChange(month: Int, year: Int) {
-        val mes = CustomCalendarView.getMonthDescription(month)
-        this.loadCarteira(mes!!)
+        this.loadCarteira(month, year)
     }
 
     /**
@@ -114,12 +114,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         carteiraViewModel.lancamentos.observe(this, Observer {
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
-            if (it.isNotEmpty()) {
-                carteiraViewModel.orcamento.value.let { orcamento ->
-                    val valorLancamentos =
-                        it.map { lancamento -> lancamento.valor!! }.reduce { soma, lanc -> soma + lanc }
-                    txValorDisponivel.text = "${orcamento!!.valor!! - valorLancamentos}"
-                }
+            carteiraViewModel.orcamento.value.let { orcamento ->
+                val valorLancamentos = lancamentoDomain.calcularValorTotal(it)
+                txValorDisponivel.text = "${orcamento!!.valor!! - valorLancamentos}"
             }
         })
 
@@ -133,14 +130,10 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     /**
      * Busca a carteira do mês
      */
-    private fun loadCarteira(mes: String) {
-        val carteira = this.carteiraRepository.findCarteiraByMes(mes)
-        if (carteira != null) {
-            loadOrcamento(carteira)
-            carteiraViewModel.carteira.postValue(carteira)
-        } else {
-            criarNovaCarteira(mes)
-        }
+    private fun loadCarteira(mes: Int, ano: Int) {
+        val carteira = carteiraDomain.buscarPorMesEAno(mes, ano)
+        carteiraViewModel.carteira.postValue(carteira)
+        loadOrcamento(carteira)
     }
 
     /**
@@ -151,22 +144,10 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
         this.calendarView.setMonth(monthId)
         val mes = CustomCalendarView.getMonthDescription(monthId)
-        this.lancamentoRepository = LancamentoRepository(this.context!!)
+        this.lancamentoDomain = LancamentoDomain(this.context!!)
         this.carteiraRepository = CarteiraRepository(this.context!!)
         this.orcamentoRepository = OrcamentoRepository(this.context!!)
         loadCarteira(mes!!)
-    }
-
-    /**
-     * Busca todos os lançamentos da carteira
-     *
-     * @param carteiraId Id da carteiraLong
-     */
-    private fun loadLancamentos(carteiraId: Long, valorOrcamento: Double) {
-        val lancamentos = lancamentoRepository.findLancamentosByCarteiraId(carteiraId)
-
-        calcularValorTotalGasto(lancamentos, valorOrcamento)
-        carteiraViewModel.lancamentos.postValue(lancamentos)
     }
 
     /**
@@ -215,7 +196,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             criarNovoOrcamento(carteira.id, carteira.mes)
         } else {
             carteiraViewModel.orcamento.postValue(orcamento)
-            loadLancamentos(carteira.id!!, orcamento.valor!!)
+            val lancamentos = lancamentoDomain.buscarLancamentosDaCarteira(carteira.id!!)
+            carteiraViewModel.lancamentos.postValue(lancamentos)
+            calcularValorTotalGasto(lancamentos, orcamento.valor!!)
         }
     }
 
@@ -228,6 +211,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         orcamentoRepository.save(orcamento) {
             this.activity!!.runOnUiThread {
                 carteiraViewModel.orcamento.postValue(it)
+                val lancamentos = lancamentoDomain.buscarLancamentosDaCarteira(carteiraId)
+                carteiraViewModel.lancamentos.postValue(lancamentos)
+                calcularValorTotalGasto(lancamentos, it!!.valor!!)
             }
         }
     }
@@ -278,7 +264,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     }
 
     fun deleteLancamento(lancamento: Lancamento) {
-        lancamentoRepository.delete(lancamento)
+        lancamentoDomain.removerLancamento(lancamento)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",

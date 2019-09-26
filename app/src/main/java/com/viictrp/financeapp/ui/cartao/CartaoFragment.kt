@@ -21,9 +21,8 @@ import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.domain.CartaoDomain
-import com.viictrp.financeapp.domain.FaturaDomain
+import com.viictrp.financeapp.domain.LancamentoDomain
 import com.viictrp.financeapp.model.Lancamento
-import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
@@ -31,7 +30,6 @@ import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
 import com.viictrp.financeapp.utils.*
 import java.util.*
-import kotlin.math.absoluteValue
 
 class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnItemChangedListener {
 
@@ -40,9 +38,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var cartaoViewModel: CartaoViewModel
 
     // Domains
-    private lateinit var lancamentoRepository: LancamentoRepository
+    private lateinit var lancamentoDomain: LancamentoDomain
     private lateinit var cartaoDomain: CartaoDomain
-    private lateinit var faturaDomain: FaturaDomain
 
     // Screen components
     private lateinit var crCartoes: RecyclerView
@@ -113,12 +110,11 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private fun init() {
         val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
         this.calendarView.setMonth(monthId)
-        this.lancamentoRepository = LancamentoRepository(this.context!!)
+        this.lancamentoDomain = LancamentoDomain(this.context!!)
         this.cartaoDomain = CartaoDomain(this.context!!)
-        this.faturaDomain = FaturaDomain(this.context!!)
         this.cartaoViewModel.mesSelecionado.postValue(Calendar.getInstance().get(Calendar.MONTH) + 1)
         this.cartaoViewModel.anoSelecionado.postValue(Calendar.getInstance().get(Calendar.YEAR))
-        loadCartoes()
+        buscarCartoes()
     }
 
     private fun initObservers() {
@@ -132,14 +128,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         })
 
         cartaoViewModel.lancamentos.observe(this, Observer {
-            if (it.isNotEmpty()) {
-                val valor =
-                    it.map { lancamento -> lancamento.valor!! }.reduce { soma, next -> soma + next }
-                this.txCartaoValorFatura.text = valor.toString()
-            } else {
-                this.txCartaoValorFatura.text =
-                    R.string.orcamento_placeholder.absoluteValue.toString()
-            }
+            this.txCartaoValorFatura.text = lancamentoDomain.calcularValorTotal(it).toString()
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
         })
@@ -157,13 +146,13 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         buildRVLancamentos(root)
     }
 
-    private fun loadCartoes() {
-        val cartoes = cartaoDomain.findCartaoByUsuarioId(Constantes.SYSTEM_USER)
+    private fun buscarCartoes() {
+        val cartoes = cartaoDomain.buscarPorUsuario(Constantes.SYSTEM_USER)
         cartaoViewModel.cartoes.postValue(cartoes)
     }
 
     private fun deleteLancamento(lancamento: Lancamento) {
-        lancamentoRepository.delete(lancamento)
+        lancamentoDomain.removerLancamento(lancamento)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",
@@ -198,6 +187,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun buscarLancamentosCartao(cartaoId: Long, mes: Int, ano: Int) {
-        cartaoViewModel.lancamentos.postValue(cartaoDomain.findLancamentos(cartaoId, mes, ano))
+        cartaoViewModel.lancamentos.postValue(
+            cartaoDomain.buscarLancamentosPorMesEAno(cartaoId, mes, ano)
+        )
     }
 }

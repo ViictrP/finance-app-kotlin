@@ -13,4 +13,6 @@ class CarteiraViewModel : ViewModel() {
     val carteira: MutableLiveData<Carteira> = MutableLiveData()
     val orcamento: MutableLiveData<Orcamento> = MutableLiveData()
     val progressBarProgress: MutableLiveData<Int> = MutableLiveData()
+    val mesSelecionado: MutableLiveData<Int> = MutableLiveData()
+    val anoSelecionado: MutableLiveData<Int> = MutableLiveData()
 }

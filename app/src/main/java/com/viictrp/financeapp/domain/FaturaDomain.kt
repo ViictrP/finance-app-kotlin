@@ -11,9 +11,16 @@ class FaturaDomain(context: Context) {
 
     private val repository = FaturaRepository(context)
     private val cartaoRepository = CartaoRepository(context)
-    private val lancamentoRepository = LancamentoRepository(context)
 
-    fun findByCartaoIdAndMesAndAno(cartaoId: Long, mes: String, ano: Int): Fatura? {
+    /**
+     * Busca a fatura do cartão informado referente ao mês e ano informados.
+     * Se não houver fatura para o período, uma nova fatura é criada e retornada
+     * @param cartaoId código do cartão
+     * @param mes mês de referência
+     * @param ano ano de referência
+     * @return fatura encontrada (ou criada)
+     */
+    fun buscarPorCartaoMesEAno(cartaoId: Long, mes: String, ano: Int): Fatura? {
         var fatura = repository.findByCartaoIdAndMesAndAno(cartaoId, mes, ano)
         if (fatura == null) {
             fatura = criar(cartaoId, mes, ano)
@@ -21,14 +28,22 @@ class FaturaDomain(context: Context) {
         return fatura
     }
 
-    fun findById(faturaId: Long): Fatura? {
+    /**
+     * Busca uma fatura pelo seu código de identificação
+     * @param faturaId código da fatura
+     * @return fatura encontrada
+     */
+    fun buscarPorId(faturaId: Long): Fatura? {
         return repository.findById(faturaId)
     }
 
-    fun findLancamentosByFaturaId(faturaId: Long): List<Lancamento> {
-        return lancamentoRepository.findLancamentosByFaturaId(faturaId)
-    }
-
+    /**
+     * Cria uma nova fatura para o cartão, no mês e ano informados.
+     * @param cartaoId código do cartão
+     * @param mes mês da fatura
+     * @param ano ano da fatura
+     * @return fatura criada
+     */
     private fun criar(cartaoId: Long, mes: String, ano: Int): Fatura {
         val cartao = cartaoRepository.findById(cartaoId)
         val fatura = Fatura().apply {
