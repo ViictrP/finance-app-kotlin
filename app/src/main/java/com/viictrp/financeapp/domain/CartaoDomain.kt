@@ -22,16 +22,12 @@ class CartaoDomain(private var context: Context) {
         }
     }
 
-    fun findLancamentos(cartaoId: Long): List<Lancamento> {
+    fun findLancamentos(cartaoId: Long, mes: Int, ano: Int): List<Lancamento> {
         val fatura = faturaDomain.findByCartaoIdAndMesAndAno(
             cartaoId,
-            CustomCalendarView.getMonthDescription(Calendar.getInstance().get(Calendar.MONTH) + 1)!!,
-            Calendar.getInstance().get(Calendar.YEAR)
+            CustomCalendarView.getMonthDescription(mes)!!,
+            ano
         )
-        fatura.let {
-            val lancamentos = faturaDomain.findLancamentosByFaturaId(it!!.id!!)
-            cartaoViewModel.lancamentos.postValue(lancamentos)
-        }
-        return listOf()
+        return faturaDomain.findLancamentosByFaturaId(fatura!!.id!!)
     }
 }

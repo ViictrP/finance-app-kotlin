@@ -2,13 +2,16 @@ package com.viictrp.financeapp.domain
 
 import android.content.Context
 import com.viictrp.financeapp.model.Fatura
+import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.FaturaRepository
+import com.viictrp.financeapp.repository.LancamentoRepository
 
 class FaturaDomain(context: Context) {
 
     private val repository = FaturaRepository(context)
     private val cartaoRepository = CartaoRepository(context)
+    private val lancamentoRepository = LancamentoRepository(context)
 
     fun findByCartaoIdAndMesAndAno(cartaoId: Long, mes: String, ano: Int): Fatura? {
         var fatura = repository.findByCartaoIdAndMesAndAno(cartaoId, mes, ano)
@@ -16,6 +19,14 @@ class FaturaDomain(context: Context) {
             fatura = criar(cartaoId, mes, ano)
         }
         return fatura
+    }
+
+    fun findById(faturaId: Long): Fatura? {
+        return repository.findById(faturaId)
+    }
+
+    fun findLancamentosByFaturaId(faturaId: Long): List<Lancamento> {
+        return lancamentoRepository.findLancamentosByFaturaId(faturaId)
     }
 
     private fun criar(cartaoId: Long, mes: String, ano: Int): Fatura {
