@@ -8,9 +8,11 @@ import io.realm.kotlin.where
 
 class CarteiraRepository(private val context: Context) {
 
-    fun findCarteiraByMes(mes: String): Carteira? {
+    fun findCarteiraByMes(mes: String, ano: Int): Carteira? {
         val realm = RealmInitializer.getInstance(this.context)
-        val managedObject = realm.where<Carteira>().equalTo(Constantes.MES, mes)
+        val managedObject = realm.where<Carteira>()
+            .equalTo(Constantes.MES, mes)
+            .equalTo(Constantes.ANO, ano)
             .findFirst()
         return if (managedObject != null) realm.copyFromRealm(managedObject)
         else null
@@ -24,14 +26,14 @@ class CarteiraRepository(private val context: Context) {
         else null
     }
 
-    fun save(carteira: Carteira, finish: (carteira: Carteira?) -> Unit) {
+    fun save(carteira: Carteira): Carteira {
         val realm = RealmInitializer.getInstance(this.context)
-        realm.executeTransactionAsync {
+        realm.executeTransaction {
             val lastId = it.where<Carteira>().max(Constantes.ID)
             if (lastId != null) carteira.id = lastId.toLong() + 1 else carteira.id = 1
             carteira.usuarioId = 1
             it.insert(carteira)
-            finish(carteira)
         }
+        return carteira
     }
 }

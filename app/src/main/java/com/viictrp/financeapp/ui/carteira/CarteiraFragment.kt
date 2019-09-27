@@ -29,7 +29,6 @@ import com.viictrp.financeapp.domain.LancamentoDomain
 import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.model.Orcamento
-import com.viictrp.financeapp.repository.CarteiraRepository
 import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
@@ -141,13 +140,13 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun init() {
-        val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
-        this.calendarView.setMonth(monthId)
-        val mes = CustomCalendarView.getMonthDescription(monthId)
         this.lancamentoDomain = LancamentoDomain(this.context!!)
-        this.carteiraRepository = CarteiraRepository(this.context!!)
+        this.carteiraDomain = CarteiraDomain(this.context!!)
         this.orcamentoRepository = OrcamentoRepository(this.context!!)
-        loadCarteira(mes!!)
+        loadCarteira(
+            Calendar.getInstance().get(Calendar.MONTH) + 1,
+            Calendar.getInstance().get(Calendar.YEAR)
+        )
     }
 
     /**
@@ -199,38 +198,6 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             val lancamentos = lancamentoDomain.buscarLancamentosDaCarteira(carteira.id!!)
             carteiraViewModel.lancamentos.postValue(lancamentos)
             calcularValorTotalGasto(lancamentos, orcamento.valor!!)
-        }
-    }
-
-    /**
-     * Cria um novo orçamento caso não exista na carteira
-     */
-    private fun criarNovoOrcamento(carteiraId: Long?, mes: String?) {
-        val orcamento = Orcamento(0.0, mes)
-        orcamento.carteiraId = carteiraId
-        orcamentoRepository.save(orcamento) {
-            this.activity!!.runOnUiThread {
-                carteiraViewModel.orcamento.postValue(it)
-                val lancamentos = lancamentoDomain.buscarLancamentosDaCarteira(carteiraId)
-                carteiraViewModel.lancamentos.postValue(lancamentos)
-                calcularValorTotalGasto(lancamentos, it!!.valor!!)
-            }
-        }
-    }
-
-    /**
-     * Cria uma nova carteira caso não exista carteiras para o mês atual
-     */
-    private fun criarNovaCarteira(mes: String) {
-        val carteira = Carteira(mes).apply {
-            this.usuarioId = 1
-        }
-        carteiraRepository.save(carteira) {
-            criarNovoOrcamento(carteira.id, carteira.mes)
-            this.activity!!.runOnUiThread {
-                carteiraViewModel.carteira.postValue(it)
-                carteiraViewModel.lancamentos.postValue(mutableListOf())
-            }
         }
     }
 
