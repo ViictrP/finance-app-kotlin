@@ -3,6 +3,7 @@ package com.viictrp.financeapp.repository
 import android.content.Context
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.realm.RealmInitializer
+import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import io.realm.kotlin.deleteFromRealm
 import io.realm.kotlin.where
@@ -14,12 +15,12 @@ class LancamentoRepository(private val context: Context) {
         val realm = RealmInitializer.getInstance(this.context)
         val primeiroDia = Calendar.getInstance()
         primeiroDia.set(Calendar.DAY_OF_MONTH, Constantes.UM)
-        primeiroDia.set(Calendar.MONTH, mes - 1)
+        primeiroDia.set(Calendar.MONTH, mes - Constantes.UM)
         primeiroDia.set(Calendar.YEAR, ano)
         val ultimoDia = Calendar.getInstance()
         ultimoDia.set(Calendar.MONTH, primeiroDia.get(Calendar.MONTH))
         ultimoDia.set(Calendar.YEAR, primeiroDia.get(Calendar.YEAR))
-        ultimoDia.set(Calendar.DAY_OF_MONTH, 30)
+        ultimoDia.set(Calendar.DAY_OF_MONTH, CustomCalendarView.ultimoDiaDoMes(mes))
         return realm.copyFromRealm(
             realm.where<Lancamento>()
                 .equalTo(Constantes.CARTEIRA_ID, carteiraId)

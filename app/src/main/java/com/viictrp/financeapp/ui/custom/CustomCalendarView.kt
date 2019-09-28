@@ -50,6 +50,16 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
         val NOVEMBRO = 11
         val DEZEMBRO = 12
 
+        val MESES_31_DIAS = listOf(
+            JANEIRO,
+            MARCO,
+            MAIO,
+            JULHO,
+            AGOSTO,
+            OUTUBRO,
+            DEZEMBRO
+        )
+
         /**
          * Obtém a descrição de um mês
          *
@@ -113,6 +123,11 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
             val myFormat = "dd/MM/yyyy" //In which you need put here
             val sdf = SimpleDateFormat(myFormat, Locale("pt", "BR"))
             return sdf.format(date)
+        }
+
+        fun ultimoDiaDoMes(mes: Int): Int {
+            return if (MESES_31_DIAS.indexOf(mes) > -1) 31
+            else 30
         }
     }
 
