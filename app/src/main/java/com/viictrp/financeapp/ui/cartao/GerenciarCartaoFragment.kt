@@ -131,7 +131,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(button: View?) {
         val cartao = getCartao()
-        this.cartaoDomain.salvar(cartao) {
+        this.cartaoDomain.salvarCartao(cartao) {
             Snackbar.make(
                 this.view!!,
                 "Cartão ${cartao.descricao} criado com sucesso.",

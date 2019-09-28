@@ -147,7 +147,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun buscarCartoes() {
-        val cartoes = cartaoDomain.buscarPorUsuario(Constantes.SYSTEM_USER)
+        val cartoes = cartaoDomain.buscarCartaoPorUsuario(Constantes.SYSTEM_USER)
         cartaoViewModel.cartoes.postValue(cartoes)
     }
 
@@ -187,8 +187,9 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     }
 
     private fun buscarLancamentosCartao(cartaoId: Long, mes: Int, ano: Int) {
-        cartaoViewModel.lancamentos.postValue(
-            cartaoDomain.buscarLancamentosPorMesEAno(cartaoId, mes, ano)
-        )
+        val month = CustomCalendarView.getMonthDescription(mes)
+        val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartaoId, month!!, ano)
+        val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura!!.id!!)
+        cartaoViewModel.lancamentos.postValue(lancamentos)
     }
 }

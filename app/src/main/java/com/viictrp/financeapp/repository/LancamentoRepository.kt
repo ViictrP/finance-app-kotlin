@@ -40,14 +40,14 @@ class LancamentoRepository(private val context: Context) {
         )
     }
 
-    fun save(lancamento: Lancamento, finish: (lancamento: Lancamento?) -> Unit) {
+    fun save(lancamento: Lancamento): Lancamento {
         val realm = RealmInitializer.getInstance(this.context)
         realm.executeTransaction {
             val lastId = it.where<Lancamento>().max(Constantes.ID)
             if (lastId != null) lancamento.id = lastId.toLong() + 1 else lancamento.id = 1
             it.insert(lancamento)
-            finish(lancamento)
         }
+        return lancamento
     }
 
     fun delete(lancamento: Lancamento) {

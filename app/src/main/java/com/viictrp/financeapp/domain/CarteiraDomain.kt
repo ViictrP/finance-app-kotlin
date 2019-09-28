@@ -22,6 +22,11 @@ class CarteiraDomain(context: Context) {
         return CarteiraAssembler.instance.toViewObject(carteira)
     }
 
+    fun buscarCarteiraPorId(carteiraId: Long): CarteiraVO {
+        val carteira = repository.findById(carteiraId)
+        return CarteiraAssembler.instance.toViewObject(carteira!!)
+    }
+
     fun buscarPorMesEAno(mes: Int, ano: Int): CarteiraVO? {
         val month = CustomCalendarView.getMonthDescription(mes)
         val carteira = this.repository.findCarteiraByMes(month!!, ano)
