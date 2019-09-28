@@ -26,9 +26,7 @@ import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.domain.CarteiraDomain
 import com.viictrp.financeapp.domain.LancamentoDomain
-import com.viictrp.financeapp.model.Carteira
 import com.viictrp.financeapp.model.Lancamento
-import com.viictrp.financeapp.model.Orcamento
 import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
@@ -83,7 +81,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         when (view!!.id) {
             R.id.btn_orcamento -> navController!!.navigate(
                 R.id.action_navegacao_carteira_to_navegacao_orcamento,
-                bundleOf(Constantes.ORCAMENTO_ID_KEY to carteiraViewModel.orcamento.value?.id),
+                bundleOf(Constantes.ORCAMENTO_ID_KEY to carteiraViewModel.carteira.value!!.orcamento!!.id),
                 null,
                 FragmentNavigatorExtras(
                     txValorOrcamento to "orcamento_value"
@@ -106,24 +104,21 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private fun buildModelObservers(root: View) {
         this.rvLancamentos = buildRecyclerView(root)
 
-        carteiraViewModel.orcamento.observe(this, Observer {
-            txValorOrcamento.text = "${it.valor}"
-        })
-
         carteiraViewModel.lancamentos.observe(this, Observer {
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
-            carteiraViewModel.orcamento.value.let { orcamento ->
-                val valorLancamentos = lancamentoDomain.calcularValorTotal(it)
-                txValorDisponivel.text = "${orcamento!!.valor!! - valorLancamentos}"
-            }
+            val orcamento = carteiraViewModel.carteira.value!!.orcamento
+            val valorLancamentos = lancamentoDomain.calcularValorTotal(it)
+            txValorDisponivel.text = "${orcamento!!.valor!! - valorLancamentos}"
         })
 
         carteiraViewModel.progressBarProgress.observe(this, Observer {
             pbOrcamento.progress = it
         })
 
-        carteiraViewModel.carteira.observe(this, Observer(System.out::println))
+        carteiraViewModel.carteira.observe(this, Observer {
+            txValorOrcamento.text = "${it.orcamento!!.valor}"
+        })
     }
 
     /**
@@ -132,7 +127,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private fun loadCarteira(mes: Int, ano: Int) {
         val carteira = carteiraDomain.buscarPorMesEAno(mes, ano)
         carteiraViewModel.carteira.postValue(carteira)
-        loadOrcamento(carteira)
+        val lancamentos = lancamentoDomain.buscarLancamentosDaCarteira(carteira!!.id!!, mes, ano)
+        carteiraViewModel.lancamentos.postValue(lancamentos)
+        calcularValorTotalGasto(lancamentos, carteira.orcamento!!.valor!!)
     }
 
     /**
@@ -140,6 +137,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun init() {
+        this.calendarView.setMonth(Calendar.getInstance().get(Calendar.MONTH) + 1)
         this.lancamentoDomain = LancamentoDomain(this.context!!)
         this.carteiraDomain = CarteiraDomain(this.context!!)
         this.orcamentoRepository = OrcamentoRepository(this.context!!)
@@ -185,23 +183,6 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     }
 
     /**
-     * Carrega o orçamento da carteira
-     *
-     * @param carteira carteira
-     */
-    private fun loadOrcamento(carteira: Carteira) {
-        val orcamento = orcamentoRepository.findOrcamentoByCarteiraId(carteira.id!!)
-        if (orcamento == null) {
-            criarNovoOrcamento(carteira.id, carteira.mes)
-        } else {
-            carteiraViewModel.orcamento.postValue(orcamento)
-            val lancamentos = lancamentoDomain.buscarLancamentosDaCarteira(carteira.id!!)
-            carteiraViewModel.lancamentos.postValue(lancamentos)
-            calcularValorTotalGasto(lancamentos, orcamento.valor!!)
-        }
-    }
-
-    /**
      * Construindo a RecyclerView para listar os lançamentos
      */
     private fun buildRecyclerView(root: View): RecyclerView {
@@ -219,7 +200,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
                 adapter.removeAt(position)
                 calcularValorTotalGasto(
                     adapter.getList(),
-                    carteiraViewModel.orcamento.value!!.valor!!
+                    carteiraViewModel.carteira.value!!.orcamento!!.valor!!
                 )
             }
         }

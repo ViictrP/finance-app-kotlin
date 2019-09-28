@@ -6,14 +6,24 @@ import com.viictrp.financeapp.realm.RealmInitializer
 import com.viictrp.financeapp.utils.Constantes
 import io.realm.kotlin.deleteFromRealm
 import io.realm.kotlin.where
+import java.util.*
 
 class LancamentoRepository(private val context: Context) {
 
-    fun findLancamentosByCarteiraId(carteiraId: Long): List<Lancamento> {
+    fun findLancamentosByCarteiraId(carteiraId: Long, mes: Int, ano: Int): List<Lancamento> {
         val realm = RealmInitializer.getInstance(this.context)
+        val primeiroDia = Calendar.getInstance()
+        primeiroDia.set(Calendar.DAY_OF_MONTH, Constantes.UM)
+        primeiroDia.set(Calendar.MONTH, mes - 1)
+        primeiroDia.set(Calendar.YEAR, ano)
+        val ultimoDia = Calendar.getInstance()
+        ultimoDia.set(Calendar.MONTH, primeiroDia.get(Calendar.MONTH))
+        ultimoDia.set(Calendar.YEAR, primeiroDia.get(Calendar.YEAR))
+        ultimoDia.set(Calendar.DAY_OF_MONTH, 30)
         return realm.copyFromRealm(
             realm.where<Lancamento>()
                 .equalTo(Constantes.CARTEIRA_ID, carteiraId)
+                .between(Constantes.DATA, primeiroDia.time, ultimoDia.time)
                 .findAll()
                 .toList()
         )

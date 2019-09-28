@@ -24,13 +24,13 @@ class OrcamentoRepository(private val context: Context) {
         else null
     }
 
-    fun save(orcamento: Orcamento, finish: (orcamento: Orcamento?) -> Unit) {
+    fun save(orcamento: Orcamento): Orcamento {
         val realm = RealmInitializer.getInstance(this.context)
-        realm.executeTransactionAsync {
+        realm.executeTransaction {
             val lastId = it.where<Orcamento>().max(Constantes.ID)
             if (lastId != null) orcamento.id = lastId.toLong() + 1 else orcamento.id = 1
             it.insert(orcamento)
-            finish(orcamento)
         }
+        return orcamento
     }
 }

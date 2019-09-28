@@ -43,6 +43,6 @@ class LancamentoDomain(context: Context) {
      * @return lista de lançamentos
      */
     fun buscarLancamentosDaCarteira(carteiraId: Long, mes: Int, ano: Int): List<Lancamento> {
-        return listOf()
+        return repository.findLancamentosByCarteiraId(carteiraId, mes, ano)
     }
 }

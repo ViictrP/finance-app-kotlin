@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorListener
 import com.viictrp.financeapp.R
+import java.text.SimpleDateFormat
 import java.util.*
 
 class CustomCalendarView : LinearLayout, View.OnClickListener {
@@ -106,6 +107,12 @@ class CustomCalendarView : LinearLayout, View.OnClickListener {
                 "DEZEMBRO" -> return DEZEMBRO
                 else -> null
             }
+        }
+
+        fun getFormattedDate(date: Date): String {
+            val myFormat = "dd/MM/yyyy" //In which you need put here
+            val sdf = SimpleDateFormat(myFormat, Locale("pt", "BR"))
+            return sdf.format(date)
         }
     }
 

@@ -94,11 +94,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         val list = mutableListOf(lancamento)
         val parcelasId = UUID.randomUUID().toString().substring(Constantes.ZERO, Constantes.DEZ)
         lancamento.parcelaId = parcelasId
-        val myFormat = "dd/MM/yyyy" //In which you need put here
-        val sdf = SimpleDateFormat(myFormat, Locale("pt", "BR"))
-        val dataInicial = sdf.parse(lancamento.data!!)
-        val calendar = Calendar.getInstance()
-        calendar.time = dataInicial!!
+        calendar.time = lancamento.data!!
         for (i in Constantes.UM until quantidadeParcelas) {
             calendar.add(Calendar.MONTH, Constantes.UM)
             list.add(Lancamento().apply {
@@ -106,7 +102,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
                 this.descricao =
                     "$descricao ${(i + Constantes.UM)}/$quantidadeParcelas"
                 this.valor = lancamento.valor
-                this.data = sdf.format(calendar.time)
+                this.data = lancamento.data
                 this.quantidadeParcelas = lancamento.quantidadeParcelas
                 this.parcelaId = parcelasId
                 this.numeroParcela = i
@@ -123,15 +119,13 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private fun salvarNaFatura(lancamento: Lancamento) {
         viewModel.cartaoId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
-                val dataArr = lancamento.data!!.split("/")
-                val diaLancamento = dataArr[Constantes.ZERO]
-                val mesLancamento = dataArr[Constantes.UM]
-                val anoLancamento = dataArr[Constantes.DOIS]
+                val calendar = Calendar.getInstance()
+                calendar.time = lancamento.data!!
                 val fatura = buscarFatura(
                     it,
-                    mesLancamento.toInt(),
-                    diaLancamento.toLong(),
-                    anoLancamento.toInt()
+                    calendar.get(Calendar.MONTH) + 1,
+                    calendar.get(Calendar.DAY_OF_MONTH),
+                    calendar.get(Calendar.YEAR)
                 )
                 if (fatura != null) {
                     lancamento.faturaId = fatura.id
@@ -145,7 +139,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun buscarFatura(cartaoId: Long, mes: Int, diaLancamento: Long, ano: Int): Fatura? {
+    private fun buscarFatura(cartaoId: Long, mes: Int, diaLancamento: Int, ano: Int): Fatura? {
         val fatura = faturaRepository.findByCartaoIdAndMesAndAno(
             cartaoId,
             CustomCalendarView.getMonthDescription(mes)!!,
@@ -234,7 +228,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         lancamento.titulo = this.etTitulo!!.text.toString()
         lancamento.descricao = this.etDescricao!!.text.toString()
         lancamento.valor = this.etValor!!.currencyDouble
-        lancamento.data = this.etData!!.text.toString()
+        lancamento.data = this.calendar.time
         lancamento.quantidadeParcelas = this.etQtParcelas!!.text.toString().toInt()
         return lancamento
     }
@@ -252,7 +246,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
             this.calendar.set(Calendar.YEAR, year)
             this.calendar.set(Calendar.MONTH, monthOfYear)
             this.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            this.updateEtData()
+            this.etData!!.setText(CustomCalendarView.getFormattedDate(this.calendar.time))
         }
         this.etData!!.setOnFocusChangeListener { _, enter ->
             if (enter)
@@ -285,17 +279,5 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         viewModel.quantidadeParcelas.observe(this, Observer {
             this.etQtParcelas?.setText("$it")
         })
-    }
-
-    /**
-     * Atualiza o valor do editText etData quando uma data for escolhida
-     * no DatePickerDialog
-     */
-    private fun updateEtData() {
-
-        val myFormat = "dd/MM/yyyy" //In which you need put here
-        val sdf = SimpleDateFormat(myFormat, Locale("pt", "BR"))
-
-        this.etData!!.setText(sdf.format(this.calendar.time))
     }
 }

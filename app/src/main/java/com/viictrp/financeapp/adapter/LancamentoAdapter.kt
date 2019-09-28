@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.model.Lancamento
+import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import kotlinx.android.synthetic.main.lancamento_recyclerview_item.view.*
 
 class LancamentoAdapter(
@@ -53,7 +54,7 @@ class LancamentoAdapter(
         fun bindView(lancamento: Lancamento) {
             titulo.text = lancamento.titulo
             descricao.text = lancamento.descricao
-            data.text = lancamento.data
+            data.text = CustomCalendarView.getFormattedDate(lancamento.data!!)
             valor.text = "${lancamento.valor}"
         }
     }

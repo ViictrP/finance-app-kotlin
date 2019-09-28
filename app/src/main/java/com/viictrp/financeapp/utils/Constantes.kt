@@ -23,6 +23,7 @@ class Constantes {
         val FATURA_ID = "faturaId"
         val USUARIO_ID = "usuarioId"
         val CARTAO_ID = "cartaoId"
+        val DATA = "data"
         val SYSTEM_USER = 1L
     }
 }
