@@ -1,7 +1,7 @@
 package com.viictrp.financeapp.transformation
 
 import com.viictrp.financeapp.model.Carteira
-import com.viictrp.financeapp.viewModel.CarteiraVO
+import com.viictrp.financeapp.viewObject.CarteiraVO
 
 class CarteiraAssembler : Assembler<Carteira, CarteiraVO>() {
 

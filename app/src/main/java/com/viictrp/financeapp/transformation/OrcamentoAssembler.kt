@@ -1,7 +1,7 @@
 package com.viictrp.financeapp.transformation
 
 import com.viictrp.financeapp.model.Orcamento
-import com.viictrp.financeapp.viewModel.OrcamentoVO
+import com.viictrp.financeapp.viewObject.OrcamentoVO
 
 class OrcamentoAssembler : Assembler<Orcamento, OrcamentoVO>() {
 

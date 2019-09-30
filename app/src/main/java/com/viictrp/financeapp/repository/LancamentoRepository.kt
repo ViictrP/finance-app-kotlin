@@ -50,11 +50,11 @@ class LancamentoRepository(private val context: Context) {
         return lancamento
     }
 
-    fun delete(lancamento: Lancamento) {
+    fun deleteById(lancamentoId: Long) {
         val realm = RealmInitializer.getInstance(this.context)
         realm.executeTransaction {
             it.where<Lancamento>()
-                .equalTo(Constantes.ID, lancamento.id)
+                .equalTo(Constantes.ID, lancamentoId)
                 .findFirst()
                 ?.deleteFromRealm()
         }

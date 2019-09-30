@@ -22,13 +22,13 @@ import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.domain.CartaoDomain
 import com.viictrp.financeapp.domain.LancamentoDomain
-import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.ui.custom.SnapOnScrollListener.OnItemChangedListener
 import com.viictrp.financeapp.utils.*
+import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
 class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnItemChangedListener {
@@ -151,8 +151,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         cartaoViewModel.cartoes.postValue(cartoes)
     }
 
-    private fun deleteLancamento(lancamento: Lancamento) {
-        lancamentoDomain.removerLancamento(lancamento)
+    private fun deleteLancamento(lancamento: LancamentoVO) {
+        lancamentoDomain.removerLancamentoPorId(lancamento.id!!)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",

@@ -26,7 +26,6 @@ import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
 import com.viictrp.financeapp.domain.CarteiraDomain
 import com.viictrp.financeapp.domain.LancamentoDomain
-import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
@@ -34,6 +33,7 @@ import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
+import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
 class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
@@ -154,7 +154,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * @param valorTotalOrcamento - valor do orçamento do mês
      */
     private fun calcularValorTotalGasto(
-        lancamentos: List<Lancamento>?,
+        lancamentos: List<LancamentoVO>?,
         valorTotalOrcamento: Double
     ) {
         var valorTotal = 0.0
@@ -196,7 +196,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
                 val position = viewHolder.adapterPosition
                 val adapter = (rvLancamentos.adapter as LancamentoAdapter)
                 val lancamento = adapter.getList()!![position]
-                deleteLancamento(lancamento)
+                removerLancamentoPorId(lancamento.id!!)
                 adapter.removeAt(position)
                 calcularValorTotalGasto(
                     adapter.getList(),
@@ -211,8 +211,8 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         return rvLancamentos
     }
 
-    fun deleteLancamento(lancamento: Lancamento) {
-        lancamentoDomain.removerLancamento(lancamento)
+    fun removerLancamentoPorId(lancamentoId: Long) {
+        lancamentoDomain.removerLancamentoPorId(lancamentoId)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",

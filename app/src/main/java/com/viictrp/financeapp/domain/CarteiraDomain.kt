@@ -9,24 +9,40 @@ import com.viictrp.financeapp.transformation.CarteiraAssembler
 import com.viictrp.financeapp.transformation.OrcamentoAssembler
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
-import com.viictrp.financeapp.viewModel.CarteiraVO
-import com.viictrp.financeapp.viewModel.OrcamentoVO
+import com.viictrp.financeapp.viewObject.CarteiraVO
+import com.viictrp.financeapp.viewObject.OrcamentoVO
 
 class CarteiraDomain(context: Context) {
 
     private val repository = CarteiraRepository(context)
     private val orcamentoRepository = OrcamentoRepository(context)
 
-    fun save(carteira: Carteira): CarteiraVO {
+    /**
+     * Salva a nova carteira no banco de dados
+     * @param carteira - nova carteira
+     * @return {CarteiraVO}
+     */
+    private fun save(carteira: Carteira): CarteiraVO {
         repository.save(carteira)
         return CarteiraAssembler.instance.toViewObject(carteira)
     }
 
+    /**
+     * Busca uma carteira para o ID fornecido
+     * @param carteiraId - ID da carteira
+     * @return {CarteiraVO}
+     */
     fun buscarCarteiraPorId(carteiraId: Long): CarteiraVO {
         val carteira = repository.findById(carteiraId)
         return CarteiraAssembler.instance.toViewObject(carteira!!)
     }
 
+    /**
+     * Busca uma carteira para o mês e ano fornecidos.
+     * @param mes - mês da carteira
+     * @param ano - ano da carteira
+     * @return {CarteiraVO}
+     */
     fun buscarPorMesEAno(mes: Int, ano: Int): CarteiraVO? {
         val month = CustomCalendarView.getMonthDescription(mes)
         val carteira = this.repository.findCarteiraByMes(month!!, ano)
@@ -41,6 +57,9 @@ class CarteiraDomain(context: Context) {
 
     /**
      * Cria uma nova carteira caso não exista carteiras para o mês atual
+     * @param mes - mês da carteira
+     * @param ano - ano da carteira
+     * @return {CarteiraVO}
      */
     private fun criarNovaCarteira(mes: String, ano: Int): CarteiraVO {
         val carteira = Carteira().apply {
@@ -48,13 +67,20 @@ class CarteiraDomain(context: Context) {
             this.mes = mes
             this.ano = ano
         }
-        repository.save(carteira)
+        val carteiraVO = this.save(carteira)
         val orcamento = criarNovoOrcamento(carteira.id, carteira.mes, carteira.ano)
-        val carteiraVO = CarteiraAssembler.instance.toViewObject(carteira)
         carteiraVO.orcamento = orcamento
         return carteiraVO
     }
 
+    /**
+     * Cria um novo orçamento para carteira, onde será armazenado o valor
+     * do orçamento do mês
+     * @param carteiraId - Código da carteira
+     * @param mes - mês da carteira
+     * @param ano - ano da carteira
+     * @return {OrcamentoVO}
+     */
     private fun criarNovoOrcamento(carteiraId: Long?, mes: String?, ano: Int?): OrcamentoVO {
         val orcamento = orcamentoRepository.save(Orcamento().apply {
             this.carteiraId = carteiraId

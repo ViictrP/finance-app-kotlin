@@ -1,4 +1,4 @@
-package com.viictrp.financeapp.viewModel
+package com.viictrp.financeapp.viewObject
 
 class OrcamentoVO {
 

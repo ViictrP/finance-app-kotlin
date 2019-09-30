@@ -1,7 +1,7 @@
 package com.viictrp.financeapp.transformation
 
 import com.viictrp.financeapp.model.Fatura
-import com.viictrp.financeapp.viewModel.FaturaVO
+import com.viictrp.financeapp.viewObject.FaturaVO
 
 class FaturaAssembler : Assembler<Fatura, FaturaVO>() {
 

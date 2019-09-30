@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.viictrp.financeapp.R
-import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
+import com.viictrp.financeapp.viewObject.LancamentoVO
 import kotlinx.android.synthetic.main.lancamento_recyclerview_item.view.*
 
 class LancamentoAdapter(
-    private var lancamentos: MutableList<Lancamento>?,
+    private var lancamentos: MutableList<LancamentoVO>?,
     private val context: Context
 ) : Adapter<LancamentoAdapter.LancamentoViewHolder>() {
 
@@ -26,12 +26,12 @@ class LancamentoAdapter(
         return lancamentos!!.size
     }
 
-    fun setList(lancamentos: MutableList<Lancamento>) {
+    fun setList(lancamentos: MutableList<LancamentoVO>) {
         this.lancamentos = lancamentos
         notifyDataSetChanged()
     }
 
-    fun getList(): List<Lancamento>? {
+    fun getList(): List<LancamentoVO>? {
         return this.lancamentos
     }
 
@@ -51,7 +51,7 @@ class LancamentoAdapter(
         val data = itemView.lancamento_data
         val valor = itemView.lancamento_valor
 
-        fun bindView(lancamento: Lancamento) {
+        fun bindView(lancamento: LancamentoVO) {
             titulo.text = lancamento.titulo
             descricao.text = lancamento.descricao
             data.text = CustomCalendarView.getFormattedDate(lancamento.data!!)

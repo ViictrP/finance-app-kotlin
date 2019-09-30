@@ -5,7 +5,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.LancamentoRepository
+import com.viictrp.financeapp.transformation.LancamentoAssembler
 import com.viictrp.financeapp.utils.Constantes
+import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
 class LancamentoDomain(context: Context) {
@@ -18,7 +20,7 @@ class LancamentoDomain(context: Context) {
      * Soma todos os valores dos lançamentos dentro da lista recebida
      * @param lancamentos Lista de lançamentos
      */
-    fun calcularValorTotal(lancamentos: List<Lancamento>): Double {
+    fun calcularValorTotal(lancamentos: List<LancamentoVO>): Double {
         if (lancamentos.isEmpty()) return Constantes.ZERO.toDouble()
         return lancamentos.map { lancamento -> lancamento.valor!! }
             .reduce { soma, next -> soma + next }
@@ -28,16 +30,17 @@ class LancamentoDomain(context: Context) {
      * Apaga um lançamento do banco de dados
      * @param lancamento Lançamento que será apagado
      */
-    fun removerLancamento(lancamento: Lancamento) {
-        repository.delete(lancamento)
+    fun removerLancamentoPorId(lancamentoId: Long) {
+        repository.deleteById(lancamentoId)
     }
 
     /**
      * Busca os lançamentos da fatura
      * @param faturaId Código da fatura
      */
-    fun buscarLancamentosDaFatura(faturaId: Long): List<Lancamento> {
-        return repository.findLancamentosByFaturaId(faturaId)
+    fun buscarLancamentosDaFatura(faturaId: Long): List<LancamentoVO> {
+        val lancamentos = repository.findLancamentosByFaturaId(faturaId)
+        return LancamentoAssembler.instance.toViewObject(lancamentos)
     }
 
     /**
@@ -47,10 +50,17 @@ class LancamentoDomain(context: Context) {
      * @param ano ano do lançamento
      * @return lista de lançamentos
      */
-    fun buscarLancamentosDaCarteira(carteiraId: Long, mes: Int, ano: Int): List<Lancamento> {
-        return repository.findLancamentosByCarteiraId(carteiraId, mes, ano)
+    fun buscarLancamentosDaCarteira(carteiraId: Long, mes: Int, ano: Int): List<LancamentoVO> {
+        val lancamentos = repository.findLancamentosByCarteiraId(carteiraId, mes, ano)
+        return LancamentoAssembler.instance.toViewObject(lancamentos)
     }
 
+    /**
+     * Salva um novo lançamento na fatura do cartão de acordo com a data
+     * do lançamento.
+     * @param lancamento - novo lançamento
+     * @param cartaoId - código do cartão
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     fun salvarNoCartao(lancamento: Lancamento, cartaoId: Long) {
         if (lancamento.quantidadeParcelas > Constantes.UM) {
@@ -61,6 +71,11 @@ class LancamentoDomain(context: Context) {
         } else salvarNaFatura(lancamento, cartaoId)
     }
 
+    /**
+     * Salva o lançamento na fatura de acordo com a data de lançamento
+     * @param lancamento - novo lançamento
+     * @param cartaoId - código do cartão
+     */
     private fun salvarNaFatura(lancamento: Lancamento, cartaoId: Long) {
         val calendar = Calendar.getInstance()
         calendar.time = lancamento.data!!
@@ -75,6 +90,11 @@ class LancamentoDomain(context: Context) {
         repository.save(lancamento)
     }
 
+    /**
+     * Salva o lançamento na carteira de acordo com a data do lançamento
+     * @param lancamento - novo lançamento
+     * @param carteiraId - código da carteira
+     */
     fun salvarNaCarteira(lancamento: Lancamento, carteiraId: Long) {
         if (carteiraId != Constantes.ZERO_LONG) {
             val carteira = carteiraDomain.buscarCarteiraPorId(carteiraId)
@@ -83,6 +103,13 @@ class LancamentoDomain(context: Context) {
         }
     }
 
+    /**
+     * Clona os lançamentos para a quantidade de parcelas fornecidas e os salva nas
+     * respectivas faturas.
+     * @param lancamento - lançamento que será clonado
+     * @param quantidadeParcelas - quantidade de clones que serão gerados
+     * @return {List<Lancamento>}
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun clonar(lancamento: Lancamento, quantidadeParcelas: Int): List<Lancamento> {
         val list = mutableListOf(lancamento)

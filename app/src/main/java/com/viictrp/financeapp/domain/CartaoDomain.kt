@@ -8,7 +8,7 @@ import com.viictrp.financeapp.repository.FaturaRepository
 import com.viictrp.financeapp.transformation.FaturaAssembler
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
-import com.viictrp.financeapp.viewModel.FaturaVO
+import com.viictrp.financeapp.viewObject.FaturaVO
 
 class CartaoDomain(context: Context) {
 
@@ -60,6 +60,16 @@ class CartaoDomain(context: Context) {
         return FaturaAssembler.instance.toViewObject(faturaRepository.findById(faturaId)!!)
     }
 
+    /**
+     * Busca a fatura do cartão para o mês e ano fornecidos. Executa a lógica
+     * de fechamento da fatura, para quando o dia fornecido for maior que o dia
+     * do fechamento da fatura, será devolvido a fatura do próximo mês.
+     * @param cartaoId - Código do cartão
+     * @param mes - mês da fatura
+     * @param dia - dia do lançamento
+     * @param ano - ano da fatura
+     * @return {FaturaVO}
+     */
     fun buscarFatura(cartaoId: Long, mes: Int, dia: Int, ano: Int): FaturaVO? {
         val month = CustomCalendarView.getMonthDescription(mes)!!
         val fatura = buscarFaturaPorCartaoMesEAno(cartaoId, month, ano)
