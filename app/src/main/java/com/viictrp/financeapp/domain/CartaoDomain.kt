@@ -56,7 +56,7 @@ class CartaoDomain(context: Context) {
      * @param faturaId código da fatura
      * @return fatura encontrada
      */
-    private fun buscarFaturaPorId(faturaId: Long): FaturaVO? {
+    fun buscarFaturaPorId(faturaId: Long): FaturaVO? {
         return FaturaAssembler.instance.toViewObject(faturaRepository.findById(faturaId)!!)
     }
 
