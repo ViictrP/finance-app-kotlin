@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -20,6 +21,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
     // VIEW ELEMENTS
     private lateinit var cetValor: CurrencyEditText
     private lateinit var btnPagar: CardView
+    private lateinit var txMesFatura: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +52,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
     private fun initChildren(view: View) {
         this.cetValor = view.findViewById(R.id.cet_valor)
         this.btnPagar = view.findViewById(R.id.btn_pagar)
+        this.txMesFatura = view.findViewById(R.id.tx_mes_fatura)
         this.btnPagar.setOnClickListener(this)
     }
 

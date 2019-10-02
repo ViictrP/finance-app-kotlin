@@ -96,6 +96,9 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                 R.id.action_navegacao_cartao_to_lancamentoFragment,
                 bundleOf(Constantes.CARTAO_ID_KEY to cartaoViewModel.cartaoSelecionado.value?.id)
             )
+            R.id.btn_pagar_cartao -> navController.navigate(
+
+            )
         }
     }
 

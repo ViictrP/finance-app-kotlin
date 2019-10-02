@@ -93,5 +93,9 @@
         android:name="com.viictrp.financeapp.ui.cartao.GerenciarCartaoFragment"
         android:label="fragment_gerenciar_cartao"
         tools:layout="@layout/fragment_gerenciar_cartao" />
+    <fragment
+        android:id="@+id/gerenciarFaturaFragment"
+        android:name="com.viictrp.financeapp.ui.cartao.GerenciarFaturaFragment"
+        android:label="GerenciarFaturaFragment" />
 
 </navigation>

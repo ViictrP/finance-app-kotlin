@@ -25,4 +25,12 @@ class PagamentoFaturaRepository(private val context: Context) {
             .findAll()
         return realm.copyFromRealm(pagamentos)
     }
+
+    fun findById(pagamentoId: Long): PagamentoFatura? {
+        val realm = RealmInitializer.getInstance(context)
+        val managedObject = realm.where<PagamentoFatura>()
+            .equalTo(Constantes.ID, pagamentoId)
+            .findFirst()
+        return realm.copyFromRealm(managedObject!!)
+    }
 }
