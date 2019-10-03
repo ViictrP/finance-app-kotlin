@@ -6,7 +6,7 @@ import io.realm.annotations.RealmClass
 import java.util.*
 
 @RealmClass
-class PagamentoFatura : RealmModel {
+open class PagamentoFatura : RealmModel {
 
     @PrimaryKey
     var id: Long? = null

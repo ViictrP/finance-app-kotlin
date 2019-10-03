@@ -1,10 +1,12 @@
 package com.viictrp.financeapp.ui.cartao
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -16,6 +18,7 @@ import com.viictrp.financeapp.domain.CartaoDomain
 import com.viictrp.financeapp.domain.LancamentoDomain
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
+import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.FaturaVO
 import java.util.*
@@ -49,6 +52,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         init()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(view: View?) {
         val valor = cetValor.currencyDouble
         val fatura = viewModel.fatura.value!!
@@ -57,6 +61,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         mostrarMensagemESair("Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso")
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun verificarValorTotalPago(fatura: FaturaVO, valorPago: Double) {
         val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura.id!!)
         val valorTotal = lancamentoDomain.calcularValorTotal(lancamentos)
@@ -65,6 +70,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun gerarNovoLancamento(fatura: FaturaVO, saldo: Double) {
         val lancamento = Lancamento().apply {
             this.quantidadeParcelas = Constantes.UM
@@ -75,7 +81,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
             this.data = Date()
             this.titulo = this.descricao
         }
-        lancamentoDomain.salvarNoCartao()
+        lancamentoDomain.salvarNoCartao(lancamento, fatura.cartaoId!!)
     }
 
     private fun mostrarMensagemESair(mensagem: String) {
@@ -85,7 +91,8 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
 
     private fun init() {
         val cartaoId = arguments?.getLong(Constantes.CARTAO_ID_KEY)
-        val mes = arguments?.getString(Constantes.MES_KEY)
+        val mesId = arguments?.getInt(Constantes.MES_KEY)
+        val mes = CustomCalendarView.getMonthDescription(mesId!!)
         val ano = arguments?.getInt(Constantes.ANO_KEY)
         val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartaoId!!, mes!!, ano!!)
         viewModel.fatura.postValue(fatura)

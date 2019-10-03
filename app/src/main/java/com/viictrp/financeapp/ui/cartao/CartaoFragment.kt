@@ -148,6 +148,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     private fun initChildren(root: View) {
         root.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
+        root.findViewById<Button>(R.id.btn_pagar_cartao).setOnClickListener(this)
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
         this.calendarView.setOnMonthChangeListener(this)
         buildCrCartoes(root)
