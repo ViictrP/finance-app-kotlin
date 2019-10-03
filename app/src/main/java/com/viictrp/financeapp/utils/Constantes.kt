@@ -14,6 +14,8 @@ class Constantes {
         val CARTEIRA_ID_KEY = "carteiraId"
         val CARTAO_ID_KEY = "cartaoId"
         val FATURA_ID_KEY = "cartaoId"
+        val MES_KEY = "mes"
+        val ANO_KEY = "ano"
 
         // Realm
         val ID = "id"

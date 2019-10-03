@@ -3,17 +3,21 @@ package com.viictrp.financeapp.domain
 import android.content.Context
 import com.viictrp.financeapp.model.Cartao
 import com.viictrp.financeapp.model.Fatura
+import com.viictrp.financeapp.model.PagamentoFatura
 import com.viictrp.financeapp.repository.CartaoRepository
 import com.viictrp.financeapp.repository.FaturaRepository
+import com.viictrp.financeapp.repository.PagamentoFaturaRepository
 import com.viictrp.financeapp.transformation.FaturaAssembler
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.FaturaVO
+import java.util.*
 
 class CartaoDomain(context: Context) {
 
     private val cartaoRepository = CartaoRepository(context)
     private val faturaRepository = FaturaRepository(context)
+    private val pagamentoRepository = PagamentoFaturaRepository(context)
 
     /**
      * Busca os cartões do usuário logado
@@ -104,5 +108,30 @@ class CartaoDomain(context: Context) {
         }
         faturaRepository.save(fatura)
         return fatura
+    }
+
+    /**
+     * Adiciona um novo pagamento para a fatura. Se o valor não foi total,
+     * um novo lançamento com o saldo é gerado na próxima fatura
+     * @param fatura - fatura que será paga
+     * @param valor - valor pago
+     */
+    fun pagarFatura(fatura: FaturaVO, valor: Double) {
+        val pagamento = gerarNovoPagamento(fatura.id!!, valor)
+        pagamentoRepository.save(pagamento)
+    }
+
+    /**
+     * Cria um novo pagamento dado o valor e o ID da fatura
+     * @param faturaId - ID da fatura
+     * @param valor - valor do pagamento
+     * @return {PagamentoFatura}
+     */
+    private fun gerarNovoPagamento(faturaId: Long, valor: Double): PagamentoFatura {
+        return PagamentoFatura().apply {
+            this.data = Date()
+            this.faturaId = faturaId
+            this.valor = valor
+        }
     }
 }

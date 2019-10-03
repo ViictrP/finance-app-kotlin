@@ -8,17 +8,26 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.domain.CartaoDomain
+import com.viictrp.financeapp.domain.LancamentoDomain
+import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.utils.Constantes
+import com.viictrp.financeapp.viewObject.FaturaVO
+import java.util.*
 
 class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
 
     private lateinit var viewModel: GerenciarFaturaViewModel
     private lateinit var cartaoDomain: CartaoDomain
+    private lateinit var lancamentoDomain: LancamentoDomain
 
     // VIEW ELEMENTS
+    private lateinit var navController: NavController
     private lateinit var cetValor: CurrencyEditText
     private lateinit var btnPagar: CardView
     private lateinit var txMesFatura: TextView
@@ -32,20 +41,53 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = view.findNavController()
         viewModel = ViewModelProviders.of(this).get(GerenciarFaturaViewModel::class.java)
         cartaoDomain = CartaoDomain(this.context!!)
+        lancamentoDomain = LancamentoDomain(this.context!!)
         initChildren(view)
         init()
     }
 
     override fun onClick(view: View?) {
+        val valor = cetValor.currencyDouble
+        val fatura = viewModel.fatura.value!!
+        cartaoDomain.pagarFatura(fatura, valor)
+        verificarValorTotalPago(fatura, valor)
+        mostrarMensagemESair("Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso")
+    }
 
+    private fun verificarValorTotalPago(fatura: FaturaVO, valorPago: Double) {
+        val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura.id!!)
+        val valorTotal = lancamentoDomain.calcularValorTotal(lancamentos)
+        if (valorPago < valorTotal) {
+            gerarNovoLancamento(fatura, valorTotal - valorPago)
+        }
+    }
+
+    private fun gerarNovoLancamento(fatura: FaturaVO, saldo: Double) {
+        val lancamento = Lancamento().apply {
+            this.quantidadeParcelas = Constantes.UM
+            this.valor = saldo
+            this.numeroParcela = Constantes.UM
+            this.faturaId = fatura.id!!
+            this.descricao = "Saldo da fatura ${fatura.mes!!}/${fatura.ano!!}"
+            this.data = Date()
+            this.titulo = this.descricao
+        }
+        lancamentoDomain.salvarNoCartao()
+    }
+
+    private fun mostrarMensagemESair(mensagem: String) {
+        Snackbar.make(this.view!!, mensagem, Snackbar.LENGTH_LONG).show()
+        navController.navigateUp()
     }
 
     private fun init() {
-        initObservers()
-        val faturaId = arguments?.getLong(Constantes.FATURA_ID_KEY)
-        val fatura = cartaoDomain.buscarFaturaPorId(faturaId!!)
+        val cartaoId = arguments?.getLong(Constantes.CARTAO_ID_KEY)
+        val mes = arguments?.getString(Constantes.MES_KEY)
+        val ano = arguments?.getInt(Constantes.ANO_KEY)
+        val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartaoId!!, mes!!, ano!!)
         viewModel.fatura.postValue(fatura)
     }
 
@@ -54,9 +96,5 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         this.btnPagar = view.findViewById(R.id.btn_pagar)
         this.txMesFatura = view.findViewById(R.id.tx_mes_fatura)
         this.btnPagar.setOnClickListener(this)
-    }
-
-    private fun initObservers() {
-
     }
 }

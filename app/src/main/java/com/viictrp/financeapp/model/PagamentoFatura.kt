@@ -12,4 +12,5 @@ class PagamentoFatura : RealmModel {
     var id: Long? = null
     var faturaId: Long? = null
     var data: Date? = null
+    var valor: Double? = null
 }
