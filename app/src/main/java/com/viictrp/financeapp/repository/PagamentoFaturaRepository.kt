@@ -15,7 +15,7 @@ class PagamentoFaturaRepository(private val context: Context) {
             if (lastId != null) pagamentoFatura.id = lastId.toLong() + 1 else pagamentoFatura.id = 1
             it.insert(pagamentoFatura)
         }
-        return realm.copyFromRealm(pagamentoFatura)
+        return pagamentoFatura
     }
 
     fun findByFaturaId(faturaId: Long): List<PagamentoFatura> {
