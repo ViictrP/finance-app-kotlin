@@ -56,6 +56,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) {
         val valor = cetValor.currencyDouble
         val fatura = viewModel.fatura.value!!
+        //TODO saldo do pagamento salvando na mesma fatura que está sendo paga
         cartaoDomain.pagarFatura(fatura, valor)
         verificarValorTotalPago(fatura, valor)
         mostrarMensagemESair("Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso")
