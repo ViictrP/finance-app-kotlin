@@ -1,6 +1,7 @@
 package com.viictrp.financeapp.domain
 
 import android.content.Context
+import com.viictrp.financeapp.exceptions.RealmNotFoundException
 import com.viictrp.financeapp.model.Cartao
 import com.viictrp.financeapp.model.Fatura
 import com.viictrp.financeapp.model.PagamentoFatura
@@ -26,6 +27,15 @@ class CartaoDomain(context: Context) {
      */
     fun buscarCartaoPorUsuario(usuarioId: Long): List<Cartao> {
         return cartaoRepository.findCartaoByUsuarioId(usuarioId)
+    }
+
+    /**
+     * Busca um cartão para o ID fornecido
+     * @param cartaoId - ID do cartão
+     * @return {Cartao}
+     */
+    fun buscarCartaoPorId(cartaoId: Long): Cartao? {
+        return cartaoRepository.findById(cartaoId)
     }
 
     /**
@@ -115,9 +125,13 @@ class CartaoDomain(context: Context) {
      * um novo lançamento com o saldo é gerado na próxima fatura
      * @param fatura - fatura que será paga
      * @param valor - valor pago
+     * @throws RealmNotFoundException - caso a fatura não seja encontrada
      */
+    @Throws(RealmNotFoundException::class)
     fun pagarFatura(fatura: FaturaVO, valor: Double) {
         val pagamento = gerarNovoPagamento(fatura.id!!, valor)
+        fatura.pago = true
+        faturaRepository.update(FaturaAssembler.instance.toEntity(fatura))
         pagamentoRepository.save(pagamento)
     }
 
@@ -134,4 +148,17 @@ class CartaoDomain(context: Context) {
             this.valor = valor
         }
     }
+
+    /**
+     * Verifica se hoje é depois do dia de fechamento do cartão
+     * @param cartao - cartão
+     * @return {boolean} true se hoje é depois do fechamento
+     */
+    fun cartaEstaFechado(cartao: Cartao, mes: Int): Boolean {
+        val calendar = Calendar.getInstance()
+        val hoje = calendar.get(Calendar.DAY_OF_MONTH)
+        val mesCalendar = calendar.get(Calendar.MONTH) + Constantes.UM
+        return cartao.dataFechamento!! <= hoje && mesCalendar == mes
+    }
 }
+

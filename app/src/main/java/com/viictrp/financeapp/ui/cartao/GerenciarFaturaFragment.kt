@@ -1,12 +1,10 @@
 package com.viictrp.financeapp.ui.cartao
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -16,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.domain.CartaoDomain
 import com.viictrp.financeapp.domain.LancamentoDomain
+import com.viictrp.financeapp.exceptions.RealmNotFoundException
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
@@ -52,17 +51,18 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         init()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(view: View?) {
         val valor = cetValor.currencyDouble
         val fatura = viewModel.fatura.value!!
-        //TODO saldo do pagamento salvando na mesma fatura que está sendo paga
-        cartaoDomain.pagarFatura(fatura, valor)
-        verificarValorTotalPago(fatura, valor)
-        mostrarMensagemESair("Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso")
+        try {
+            cartaoDomain.pagarFatura(fatura, valor)
+            verificarValorTotalPago(fatura, valor)
+            mostrarMensagemESair("Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso", true)
+        } catch (exception: RealmNotFoundException) {
+            mostrarMensagemESair(exception.message!!, false)
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun verificarValorTotalPago(fatura: FaturaVO, valorPago: Double) {
         val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura.id!!)
         val valorTotal = lancamentoDomain.calcularValorTotal(lancamentos)
@@ -72,21 +72,36 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
     }
 
     private fun gerarNovoLancamento(fatura: FaturaVO, saldo: Double) {
+        val faturaFechada = verificarSeFaturaEstaFechada(fatura)
         val lancamento = Lancamento().apply {
             this.quantidadeParcelas = Constantes.UM
             this.valor = saldo
             this.numeroParcela = Constantes.UM
             this.faturaId = fatura.id!!
             this.descricao = "Saldo da fatura ${fatura.mes!!}/${fatura.ano!!}"
-            this.data = Date()
+            this.data = obterDataNovoLancamento(faturaFechada)
             this.titulo = this.descricao
         }
         lancamentoDomain.salvarNoCartao(lancamento, fatura.cartaoId!!)
     }
 
-    private fun mostrarMensagemESair(mensagem: String) {
+    private fun verificarSeFaturaEstaFechada(fatura: FaturaVO): Boolean {
+        val cartao = cartaoDomain.buscarCartaoPorId(fatura.cartaoId!!)
+        return cartaoDomain.cartaEstaFechado(cartao!!)
+    }
+
+    private fun obterDataNovoLancamento(faturaFechada: Boolean): Date {
+        val calendar = Calendar.getInstance()
+        if (!faturaFechada) {
+            calendar.add(Calendar.MONTH, Constantes.UM)
+        }
+        return calendar.time
+    }
+
+    private fun mostrarMensagemESair(mensagem: String, sair: Boolean) {
         Snackbar.make(this.view!!, mensagem, Snackbar.LENGTH_LONG).show()
-        navController.navigateUp()
+        if (sair)
+            navController.navigateUp()
     }
 
     private fun init() {
