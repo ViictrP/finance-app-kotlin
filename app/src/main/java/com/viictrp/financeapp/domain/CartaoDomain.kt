@@ -154,11 +154,24 @@ class CartaoDomain(context: Context) {
      * @param cartao - cartão
      * @return {boolean} true se hoje é depois do fechamento
      */
-    fun cartaEstaFechado(cartao: Cartao, mes: Int): Boolean {
+    fun cartaoEstaFechado(cartao: Cartao, mes: Int, ano: Int): Boolean {
         val calendar = Calendar.getInstance()
         val hoje = calendar.get(Calendar.DAY_OF_MONTH)
         val mesCalendar = calendar.get(Calendar.MONTH) + Constantes.UM
-        return cartao.dataFechamento!! <= hoje && mesCalendar == mes
+        val anoCalendar = calendar.get(Calendar.YEAR)
+        if (mes < mesCalendar) return true
+        if (ano < anoCalendar) return true
+        return hoje >= cartao.dataFechamento!! && mes == mesCalendar && ano == anoCalendar
+    }
+
+    fun verificarFaturaPaga(cartao: Cartao, mes: Int, ano: Int): Boolean {
+        val fatura = buscarFaturaPorCartaoMesEAno(
+            cartao.id!!,
+            CustomCalendarView.getMonthDescription(mes)!!,
+            ano
+        )
+        if (fatura != null) return fatura.pago!!
+        return false
     }
 }
 

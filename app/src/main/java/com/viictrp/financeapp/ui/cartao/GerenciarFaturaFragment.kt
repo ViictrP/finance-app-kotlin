@@ -57,7 +57,10 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         try {
             cartaoDomain.pagarFatura(fatura, valor)
             verificarValorTotalPago(fatura, valor)
-            mostrarMensagemESair("Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso", true)
+            mostrarMensagemESair(
+                "Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso",
+                true
+            )
         } catch (exception: RealmNotFoundException) {
             mostrarMensagemESair(exception.message!!, false)
         }
@@ -87,7 +90,11 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
 
     private fun verificarSeFaturaEstaFechada(fatura: FaturaVO): Boolean {
         val cartao = cartaoDomain.buscarCartaoPorId(fatura.cartaoId!!)
-        return cartaoDomain.cartaEstaFechado(cartao!!)
+        return cartaoDomain.cartaoEstaFechado(
+            cartao!!,
+            CustomCalendarView.getMonthId(fatura.mes!!)!!,
+            fatura.ano!!
+        )
     }
 
     private fun obterDataNovoLancamento(faturaFechada: Boolean): Date {
