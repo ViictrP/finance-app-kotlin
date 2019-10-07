@@ -48,6 +48,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var txCartaoValorFatura: RialTextView
     private lateinit var txCartaoDescricao: TextView
     private lateinit var btnPagarFatura: Button
+    private lateinit var btnNovoLancamento: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,10 +79,6 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         cartaoViewModel.cartoes.value.let {
             it.let { cartoes ->
                 val cartao = cartoes!![position]
-                val mes = cartaoViewModel.mesSelecionado.value!!
-                val ano = cartaoViewModel.anoSelecionado.value!!
-                val faturaFechada = cartaoDomain.cartaoEstaFechado(cartao, mes, ano)
-                desabilitarBotaoPagarFatura(faturaFechada)
                 cartaoViewModel.cartaoSelecionado.postValue(cartao)
                 buscarLancamentosCartao(
                     cartao.id!!,
@@ -112,14 +109,16 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         }
     }
 
-    private fun desabilitarBotaoPagarFatura(faturaFechada: Boolean) {
-        val mesId = cartaoViewModel.mesSelecionado.value!!
+    private fun desabilitarBotaoPagarFatura(faturaFechada: Boolean, mesId: Int, ano: Int) {
         val mes = CustomCalendarView.getMonthDescription(mesId)
-        val ano = cartaoViewModel.anoSelecionado.value!!
-        val cartao = cartaoViewModel.cartaoSelecionado.value!!
-        val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartao.id!!, mes!!, ano)
-        val pago = if (fatura != null) fatura.pago!! else false
-        this.btnPagarFatura.isEnabled = faturaFechada && !pago
+        cartaoViewModel.cartaoSelecionado.value.let {
+            if (it == null) this.btnPagarFatura.isEnabled = false else {
+                val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(it.id!!, mes!!, ano)
+                val pago = if (fatura != null) fatura.pago!! else false
+                this.btnPagarFatura.isEnabled = faturaFechada && !pago
+                this.btnNovoLancamento.isEnabled = !faturaFechada
+            }
+        }
     }
 
     override fun onMonthChange(month: Int, year: Int) {
@@ -128,7 +127,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             cartaoViewModel.mesSelecionado.postValue(month)
             cartaoViewModel.anoSelecionado.postValue(year)
             val faturaFechada = cartaoDomain.cartaoEstaFechado(cartao!!, month, year)
-            desabilitarBotaoPagarFatura(faturaFechada)
+            desabilitarBotaoPagarFatura(faturaFechada, month, year)
         }
     }
 
@@ -160,11 +159,16 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
         cartaoViewModel.cartaoSelecionado.observe(this, Observer {
             this.txCartaoDescricao.text = it.descricao
+            val mes = cartaoViewModel.mesSelecionado.value!!
+            val ano = cartaoViewModel.anoSelecionado.value!!
+            val faturaFechada = cartaoDomain.cartaoEstaFechado(it, mes, ano)
+            desabilitarBotaoPagarFatura(faturaFechada, mes, ano)
         })
     }
 
     private fun initChildren(root: View) {
-        root.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
+        this.btnNovoLancamento = root.findViewById(R.id.btn_novo_lancamento)
+        this.btnNovoLancamento.setOnClickListener(this)
         this.btnPagarFatura = root.findViewById(R.id.btn_pagar_cartao)
         this.btnPagarFatura.setOnClickListener(this)
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
