@@ -61,7 +61,6 @@ class LancamentoDomain(context: Context) {
      * @param lancamento - novo lançamento
      * @param cartaoId - código do cartão
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     fun salvarNoCartao(lancamento: Lancamento, cartaoId: Long) {
         if (lancamento.quantidadeParcelas > Constantes.UM) {
             val lancamentos = clonar(lancamento, lancamento.quantidadeParcelas)
@@ -110,7 +109,6 @@ class LancamentoDomain(context: Context) {
      * @param quantidadeParcelas - quantidade de clones que serão gerados
      * @return {List<Lancamento>}
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun clonar(lancamento: Lancamento, quantidadeParcelas: Int): List<Lancamento> {
         val list = mutableListOf(lancamento)
         val calendar = Calendar.getInstance()

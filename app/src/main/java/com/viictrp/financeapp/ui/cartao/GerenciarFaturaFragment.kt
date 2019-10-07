@@ -70,7 +70,6 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun gerarNovoLancamento(fatura: FaturaVO, saldo: Double) {
         val lancamento = Lancamento().apply {
             this.quantidadeParcelas = Constantes.UM
