@@ -164,14 +164,17 @@ class CartaoDomain(context: Context) {
         return hoje >= cartao.dataFechamento!! && mes == mesCalendar && ano == anoCalendar
     }
 
-    fun verificarFaturaPaga(cartao: Cartao, mes: Int, ano: Int): Boolean {
-        val fatura = buscarFaturaPorCartaoMesEAno(
-            cartao.id!!,
-            CustomCalendarView.getMonthDescription(mes)!!,
-            ano
-        )
-        if (fatura != null) return fatura.pago!!
-        return false
+    fun buscarPagamentosFaturaPorMesAno(faturaId: Long, mes: Int, ano: Int): List<PagamentoFatura> {
+        val primeiroDia = Calendar.getInstance()
+        primeiroDia.set(Calendar.DAY_OF_MONTH, Constantes.UM)
+        primeiroDia.set(Calendar.MONTH, mes - Constantes.UM)
+        primeiroDia.set(Calendar.YEAR, ano)
+        val ultimoDia = Calendar.getInstance()
+        ultimoDia.set(Calendar.MONTH, primeiroDia.get(Calendar.MONTH))
+        ultimoDia.set(Calendar.YEAR, primeiroDia.get(Calendar.YEAR))
+        ultimoDia.set(Calendar.DAY_OF_MONTH, CustomCalendarView.ultimoDiaDoMes(mes))
+        val pagamentos = pagamentoRepository.findByFaturaId(faturaId)
+        return pagamentoRepository.findByFaturaIdAndBetweenDates(faturaId, primeiroDia.time, ultimoDia.time)
     }
 }
 

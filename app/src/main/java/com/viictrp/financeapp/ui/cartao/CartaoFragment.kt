@@ -49,6 +49,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var txCartaoDescricao: TextView
     private lateinit var btnPagarFatura: Button
     private lateinit var btnNovoLancamento: Button
+    private lateinit var txPagoValor: RialTextView
+    private lateinit var txPago: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -117,6 +119,20 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                 val pago = if (fatura != null) fatura.pago!! else false
                 this.btnPagarFatura.isEnabled = faturaFechada && !pago
                 this.btnNovoLancamento.isEnabled = !faturaFechada
+                if (pago) {
+                    val pagamentos =
+                        cartaoDomain.buscarPagamentosFaturaPorMesAno(fatura!!.id!!, mesId, ano)
+                    if (pagamentos.isNotEmpty()) {
+                        val valor = pagamentos.map { pagamento -> pagamento.valor!! }
+                            .reduce { soma, next -> soma + next }
+                        this.txPagoValor.text = "$valor"
+                        this.txPago.visibility = View.VISIBLE
+                        this.txPagoValor.visibility = View.VISIBLE
+                    }
+                } else {
+                    this.txPago.visibility = View.GONE
+                    this.txPagoValor.visibility = View.GONE
+                }
             }
         }
     }
@@ -173,6 +189,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         this.btnPagarFatura.setOnClickListener(this)
         this.calendarView = root.findViewById(R.id.calendarView_cartoes)
         this.calendarView.setOnMonthChangeListener(this)
+        this.txPagoValor = root.findViewById(R.id.tx_pago_valor)
+        this.txPago = root.findViewById(R.id.tx_pago)
         buildCrCartoes(root)
         buildRVLancamentos(root)
     }

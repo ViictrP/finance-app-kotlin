@@ -8,6 +8,7 @@
     <string name="title_cartao_pagar">Pagar.</string>
     <string name="title_del_lanc_carteira">Apagar Lanç.</string>
     <string name="placeholder">placeholder</string>
+    <string name="pagoplaceholder">PAGO</string>
     <string name="money_placeholder">10000</string>
     <string name="month_placeholder">AGOSTO</string>
     <string name="year_placeholder">2019</string>
