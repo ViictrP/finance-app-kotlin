@@ -129,7 +129,7 @@ class CartaoDomain(context: Context) {
      */
     @Throws(RealmNotFoundException::class)
     fun pagarFatura(fatura: FaturaVO, valor: Double) {
-        val pagamento = gerarNovoPagamento(fatura.id!!, valor)
+        val pagamento = gerarNovoPagamento(fatura.id!!, fatura.mes!!, valor)
         fatura.pago = true
         faturaRepository.update(FaturaAssembler.instance.toEntity(fatura))
         pagamentoRepository.save(pagamento)
@@ -141,11 +141,12 @@ class CartaoDomain(context: Context) {
      * @param valor - valor do pagamento
      * @return {PagamentoFatura}
      */
-    private fun gerarNovoPagamento(faturaId: Long, valor: Double): PagamentoFatura {
+    private fun gerarNovoPagamento(faturaId: Long, mes: String, valor: Double): PagamentoFatura {
         return PagamentoFatura().apply {
             this.data = Date()
             this.faturaId = faturaId
             this.valor = valor
+            this.mesReferencia = mes
         }
     }
 
@@ -164,17 +165,9 @@ class CartaoDomain(context: Context) {
         return hoje >= cartao.dataFechamento!! && mes == mesCalendar && ano == anoCalendar
     }
 
-    fun buscarPagamentosFaturaPorMesAno(faturaId: Long, mes: Int, ano: Int): List<PagamentoFatura> {
-        val primeiroDia = Calendar.getInstance()
-        primeiroDia.set(Calendar.DAY_OF_MONTH, Constantes.UM)
-        primeiroDia.set(Calendar.MONTH, mes - Constantes.UM)
-        primeiroDia.set(Calendar.YEAR, ano)
-        val ultimoDia = Calendar.getInstance()
-        ultimoDia.set(Calendar.MONTH, primeiroDia.get(Calendar.MONTH))
-        ultimoDia.set(Calendar.YEAR, primeiroDia.get(Calendar.YEAR))
-        ultimoDia.set(Calendar.DAY_OF_MONTH, CustomCalendarView.ultimoDiaDoMes(mes))
-        val pagamentos = pagamentoRepository.findByFaturaId(faturaId)
-        return pagamentoRepository.findByFaturaIdAndBetweenDates(faturaId, primeiroDia.time, ultimoDia.time)
+    fun buscarPagamentosFaturaPorMesAndAno(faturaId: Long, mesId: Int, ano: Int): List<PagamentoFatura> {
+        val mes = CustomCalendarView.getMonthDescription(mesId)
+        return pagamentoRepository.findByFaturaIdAndMesAndAno(faturaId, mes!!, ano)
     }
 }
 

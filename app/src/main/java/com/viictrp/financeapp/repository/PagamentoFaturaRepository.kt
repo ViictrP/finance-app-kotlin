@@ -28,11 +28,12 @@ class PagamentoFaturaRepository(private val context: Context) {
         return realm.copyFromRealm(pagamentos)
     }
 
-    fun findByFaturaIdAndBetweenDates(faturaId: Long, from: Date, to: Date): List<PagamentoFatura> {
+    fun findByFaturaIdAndMesAndAno(faturaId: Long, mes: String, ano: Int): List<PagamentoFatura> {
         val realm = RealmInitializer.getInstance(context)
         val pagamentos = realm.where<PagamentoFatura>()
             .equalTo(Constantes.FATURA_ID, faturaId).and()
-            .between(Constantes.DATA, from, to)
+            .equalTo(Constantes.MES, mes).and()
+            .equalTo(Constantes.ANO, ano)
             .findAll()
         return realm.copyFromRealm(pagamentos)
     }
