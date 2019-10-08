@@ -120,6 +120,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                 this.btnPagarFatura.isEnabled = faturaFechada && !pago
                 this.btnNovoLancamento.isEnabled = !faturaFechada
                 if (pago) {
+                    //TODO encontrar meio para buscar os pagamentos da fatura na data correta
                     val pagamentos =
                         cartaoDomain.buscarPagamentosFaturaPorMesAno(fatura!!.id!!, mesId, ano)
                     if (pagamentos.isNotEmpty()) {
