@@ -27,7 +27,7 @@
     <string name="btn_salvar">Salvar</string>
     <string name="btn_pagar">Pagar</string>
     <string name="gerenciar_orcamento_text">Insira o valor do orçamento para editar, depois clique em salvar para realizar a alteração.</string>
-    <string name="gerenciar_fatura_text">Insira o valor que deseja marcar como pago. Se o valor não for total, será criado um novo lançamento na próxima fatura com o saldo restante.</string>
+    <string name="gerenciar_fatura_text">Insira o valor que deseja marcar como pago. Se o valor não for total, será criado um novo lançamento na próxima fatura com o saldo restante. Caso o valor do pagamento seja maior que o valor da fatura, será considerado o valor total da fatura como pagamento.</string>
     <string name="novo_lancamento_subtitle">Adicionar novo lançamento.</string>
     <string name="novo_cartao_title">Adicionar novo cartão.</string>
     <string name="preencha_tudo">Por favor preencha todos os campos.</string>

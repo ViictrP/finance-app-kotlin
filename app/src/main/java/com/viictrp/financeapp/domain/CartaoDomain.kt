@@ -129,7 +129,7 @@ class CartaoDomain(context: Context) {
      */
     @Throws(RealmNotFoundException::class)
     fun pagarFatura(fatura: FaturaVO, valor: Double) {
-        val pagamento = gerarNovoPagamento(fatura.id!!, fatura.mes!!, valor)
+        val pagamento = gerarNovoPagamento(fatura, valor)
         fatura.pago = true
         faturaRepository.update(FaturaAssembler.instance.toEntity(fatura))
         pagamentoRepository.save(pagamento)
@@ -141,12 +141,13 @@ class CartaoDomain(context: Context) {
      * @param valor - valor do pagamento
      * @return {PagamentoFatura}
      */
-    private fun gerarNovoPagamento(faturaId: Long, mes: String, valor: Double): PagamentoFatura {
+    private fun gerarNovoPagamento(fatura: FaturaVO, valor: Double): PagamentoFatura {
         return PagamentoFatura().apply {
             this.data = Date()
-            this.faturaId = faturaId
+            this.faturaId = fatura.id!!
             this.valor = valor
-            this.mesReferencia = mes
+            this.mesReferencia = fatura.mes!!
+            this.anoReferencia = fatura.ano!!
         }
     }
 

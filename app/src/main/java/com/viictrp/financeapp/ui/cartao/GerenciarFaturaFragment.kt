@@ -20,6 +20,7 @@ import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.FaturaVO
+import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
 class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
@@ -52,9 +53,10 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        val valor = cetValor.currencyDouble
-        val fatura = viewModel.fatura.value!!
         try {
+            val fatura = viewModel.fatura.value!!
+            val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura.id!!)
+            val valor = obterValorPagamento(lancamentos)
             cartaoDomain.pagarFatura(fatura, valor)
             verificarValorTotalPago(fatura, valor)
             mostrarMensagemESair(
@@ -64,6 +66,13 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         } catch (exception: RealmNotFoundException) {
             mostrarMensagemESair(exception.message!!, false)
         }
+    }
+
+    private fun obterValorPagamento(lancamentos: List<LancamentoVO>): Double {
+        val valor = cetValor.currencyDouble
+        val valorFatura = lancamentoDomain.calcularValorTotal(lancamentos)
+        return if (valor > valorFatura) valorFatura
+        else valor
     }
 
     private fun verificarValorTotalPago(fatura: FaturaVO, valorPago: Double) {
@@ -117,6 +126,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         val mes = CustomCalendarView.getMonthDescription(mesId!!)
         val ano = arguments?.getInt(Constantes.ANO_KEY)
         val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartaoId!!, mes!!, ano!!)
+        this.txMesFatura.text = fatura!!.mes!!
         viewModel.fatura.postValue(fatura)
     }
 

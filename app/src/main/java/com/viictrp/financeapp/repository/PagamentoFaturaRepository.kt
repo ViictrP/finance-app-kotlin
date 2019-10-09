@@ -32,8 +32,8 @@ class PagamentoFaturaRepository(private val context: Context) {
         val realm = RealmInitializer.getInstance(context)
         val pagamentos = realm.where<PagamentoFatura>()
             .equalTo(Constantes.FATURA_ID, faturaId).and()
-            .equalTo(Constantes.MES, mes).and()
-            .equalTo(Constantes.ANO, ano)
+            .equalTo(Constantes.MES_REFERENCIA, mes).and()
+            .equalTo(Constantes.ANO_REFERENCIA, ano)
             .findAll()
         return realm.copyFromRealm(pagamentos)
     }
