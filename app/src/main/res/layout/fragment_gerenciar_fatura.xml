@@ -7,11 +7,13 @@
     android:layout_height="wrap_content"
     android:scrollbars="none">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         android:padding="30dp"
+        android:orientation="vertical"
+        android:divider="@drawable/linearlayout_divider"
         tools:context=".ui.orcamento.GerenciarOrcamento">
 
         <TextView
@@ -21,39 +23,28 @@
             android:text="@string/gerenciar_fatura_text"
             android:textAlignment="textStart"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginBottom="20dp"/>
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
             android:text="Pagamento da fatura de"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="@+id/textView3"
-            app:layout_constraintStart_toStartOf="@+id/textView3"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+            android:textSize="20sp"/>
 
         <TextView
             android:id="@+id/tx_mes_fatura"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:text="SETEMBRO"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/textView4"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/textView4"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            android:layout_marginBottom="20dp"/>
 
         <com.viictrp.financeapp.ui.custom.CurrencyEditText
             android:id="@+id/cet_valor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:autofillHints="@string/valor_placeholder"
             android:background="@drawable/rounded_edittext"
             android:drawableStart="@drawable/ic_money_bag_with_dollar_symbol_24"
@@ -69,23 +60,19 @@
             android:textSize="30sp"
             android:transitionName="orcamento_input"
             app:groupDivider="."
-            app:layout_constraintEnd_toEndOf="@+id/tx_mes_fatura"
-            app:layout_constraintStart_toStartOf="@+id/tx_mes_fatura"
-            app:layout_constraintTop_toBottomOf="@+id/tx_mes_fatura"
-            app:monetaryDivider="," />
+            app:monetaryDivider=","
+            android:layout_marginBottom="20dp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/btn_pagar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="40dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
             android:transitionName="btn_salvar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cet_valor">
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="30dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -120,5 +107,5 @@
 
         </androidx.cardview.widget.CardView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>

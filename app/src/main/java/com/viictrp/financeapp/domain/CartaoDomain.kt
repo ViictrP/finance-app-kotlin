@@ -122,7 +122,7 @@ class CartaoDomain(context: Context) {
 
     /**
      * Adiciona um novo pagamento para a fatura. Se o valor não foi total,
-     * um novo lançamento com o saldo é gerado na próxima fatura
+     * um novo lançamento com o saldo é gerado na próxima fatura.
      * @param fatura - fatura que será paga
      * @param valor - valor pago
      * @throws RealmNotFoundException - caso a fatura não seja encontrada
@@ -166,7 +166,11 @@ class CartaoDomain(context: Context) {
         return hoje >= cartao.dataFechamento!! && mes == mesCalendar && ano == anoCalendar
     }
 
-    fun buscarPagamentosFaturaPorMesAndAno(faturaId: Long, mesId: Int, ano: Int): List<PagamentoFatura> {
+    fun buscarPagamentosFaturaPorMesAndAno(
+        faturaId: Long,
+        mesId: Int,
+        ano: Int
+    ): List<PagamentoFatura> {
         val mes = CustomCalendarView.getMonthDescription(mesId)
         return pagamentoRepository.findByFaturaIdAndMesAndAno(faturaId, mes!!, ano)
     }

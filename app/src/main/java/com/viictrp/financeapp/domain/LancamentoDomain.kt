@@ -123,7 +123,7 @@ class LancamentoDomain(context: Context) {
                 this.titulo = lancamento.titulo
                 this.descricao =
                     "$descricao ${(i + Constantes.UM)}/$quantidadeParcelas"
-                this.valor = lancamento.valor
+                this.valor = lancamento.valor!! / quantidadeParcelas
                 this.data = calendar.time
                 this.quantidadeParcelas = lancamento.quantidadeParcelas
                 this.parcelaId = parcelasId
