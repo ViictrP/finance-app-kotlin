@@ -116,6 +116,7 @@ class LancamentoDomain(context: Context) {
         val parcelasId = UUID.randomUUID().toString().substring(Constantes.ZERO, Constantes.DEZ)
         lancamento.descricao = "${lancamento.descricao} ${Constantes.UM}/$quantidadeParcelas"
         lancamento.parcelaId = parcelasId
+        lancamento.valor = lancamento.valor!! / quantidadeParcelas
         calendar.time = lancamento.data!!
         for (i in Constantes.UM until quantidadeParcelas) {
             calendar.add(Calendar.MONTH, Constantes.UM)
@@ -123,8 +124,8 @@ class LancamentoDomain(context: Context) {
                 this.titulo = lancamento.titulo
                 this.descricao =
                     "$descricao ${(i + Constantes.UM)}/$quantidadeParcelas"
-                this.valor = lancamento.valor!! / quantidadeParcelas
                 this.data = calendar.time
+                this.valor = lancamento.valor
                 this.quantidadeParcelas = lancamento.quantidadeParcelas
                 this.parcelaId = parcelasId
                 this.numeroParcela = i
