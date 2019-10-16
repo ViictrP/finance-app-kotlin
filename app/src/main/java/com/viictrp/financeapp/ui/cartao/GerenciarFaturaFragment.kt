@@ -12,8 +12,8 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.R
-import com.viictrp.financeapp.domain.CartaoDomain
-import com.viictrp.financeapp.domain.LancamentoDomain
+import com.viictrp.financeapp.service.CartaoService
+import com.viictrp.financeapp.service.LancamentoService
 import com.viictrp.financeapp.exceptions.RealmNotFoundException
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
@@ -26,8 +26,8 @@ import java.util.*
 class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
 
     private lateinit var viewModel: GerenciarFaturaViewModel
-    private lateinit var cartaoDomain: CartaoDomain
-    private lateinit var lancamentoDomain: LancamentoDomain
+    private lateinit var cartaoService: CartaoService
+    private lateinit var lancamentoService: LancamentoService
 
     // VIEW ELEMENTS
     private lateinit var navController: NavController
@@ -46,8 +46,8 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
         viewModel = ViewModelProviders.of(this).get(GerenciarFaturaViewModel::class.java)
-        cartaoDomain = CartaoDomain(this.context!!)
-        lancamentoDomain = LancamentoDomain(this.context!!)
+        cartaoService = CartaoService(this.context!!)
+        lancamentoService = LancamentoService(this.context!!)
         initChildren(view)
         init()
     }
@@ -55,9 +55,9 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) {
         try {
             val fatura = viewModel.fatura.value!!
-            val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura.id!!)
+            val lancamentos = lancamentoService.buscarLancamentosDaFatura(fatura.id!!)
             val valor = obterValorPagamento(lancamentos)
-            cartaoDomain.pagarFatura(fatura, valor)
+            cartaoService.pagarFatura(fatura, valor)
             verificarValorTotalPago(fatura, valor)
             mostrarMensagemESair(
                 "Pagamento no valor $valor para fatura do mês de ${fatura.mes}/${fatura.ano} realizado com sucesso",
@@ -70,14 +70,14 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
 
     private fun obterValorPagamento(lancamentos: List<LancamentoVO>): Double {
         val valor = cetValor.currencyDouble
-        val valorFatura = lancamentoDomain.calcularValorTotal(lancamentos)
+        val valorFatura = lancamentoService.calcularValorTotal(lancamentos)
         return if (valor > valorFatura) valorFatura
         else valor
     }
 
     private fun verificarValorTotalPago(fatura: FaturaVO, valorPago: Double) {
-        val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura.id!!)
-        val valorTotal = lancamentoDomain.calcularValorTotal(lancamentos)
+        val lancamentos = lancamentoService.buscarLancamentosDaFatura(fatura.id!!)
+        val valorTotal = lancamentoService.calcularValorTotal(lancamentos)
         if (valorPago < valorTotal) {
             gerarNovoLancamento(fatura, valorTotal - valorPago)
         }
@@ -94,12 +94,12 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
             this.data = obterDataNovoLancamento(faturaFechada)
             this.titulo = this.descricao
         }
-        lancamentoDomain.salvarNoCartao(lancamento, fatura.cartaoId!!)
+        lancamentoService.salvarNoCartao(lancamento, fatura.cartaoId!!)
     }
 
     private fun verificarSeFaturaEstaFechada(fatura: FaturaVO): Boolean {
-        val cartao = cartaoDomain.buscarCartaoPorId(fatura.cartaoId!!)
-        return cartaoDomain.cartaoEstaFechado(
+        val cartao = cartaoService.buscarCartaoPorId(fatura.cartaoId!!)
+        return cartaoService.cartaoEstaFechado(
             cartao!!,
             CustomCalendarView.getMonthId(fatura.mes!!)!!,
             fatura.ano!!
@@ -125,7 +125,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
         val mesId = arguments?.getInt(Constantes.MES_KEY)
         val mes = CustomCalendarView.getMonthDescription(mesId!!)
         val ano = arguments?.getInt(Constantes.ANO_KEY)
-        val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartaoId!!, mes!!, ano!!)
+        val fatura = cartaoService.buscarFaturaPorCartaoMesEAno(cartaoId!!, mes!!, ano!!)
         this.txMesFatura.text = fatura!!.mes!!
         viewModel.fatura.postValue(fatura)
     }

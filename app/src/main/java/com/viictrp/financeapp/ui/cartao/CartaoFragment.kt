@@ -6,6 +6,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -20,8 +21,8 @@ import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.CartaoAdapter
 import com.viictrp.financeapp.adapter.LancamentoAdapter
-import com.viictrp.financeapp.domain.CartaoDomain
-import com.viictrp.financeapp.domain.LancamentoDomain
+import com.viictrp.financeapp.service.CartaoService
+import com.viictrp.financeapp.service.LancamentoService
 import com.viictrp.financeapp.ui.custom.CirclePagerIndicatorDecoration
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
@@ -36,10 +37,10 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var navController: NavController
 
     // Domains
-    private lateinit var lancamentoDomain: LancamentoDomain
+    private lateinit var lancamentoService: LancamentoService
 
     private lateinit var cartaoViewModel: CartaoViewModel
-    private lateinit var cartaoDomain: CartaoDomain
+    private lateinit var cartaoService: CartaoService
 
     // Screen components
     private lateinit var crCartoes: RecyclerView
@@ -51,6 +52,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private lateinit var btnNovoLancamento: Button
     private lateinit var txPagoValor: RialTextView
     private lateinit var txPago: TextView
+    private lateinit var pbLimite: ProgressBar
+    private lateinit var txValorDisponivel: RialTextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -115,13 +118,13 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         val mes = CustomCalendarView.getMonthDescription(mesId)
         cartaoViewModel.cartaoSelecionado.value.let {
             if (it == null) this.btnPagarFatura.isEnabled = false else {
-                val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(it.id!!, mes!!, ano)
+                val fatura = cartaoService.buscarFaturaPorCartaoMesEAno(it.id!!, mes!!, ano)
                 val pago = if (fatura != null) fatura.pago!! else false
                 this.btnPagarFatura.isEnabled = faturaFechada && !pago
                 this.btnNovoLancamento.isEnabled = !faturaFechada
                 if (pago) {
                     val pagamentos =
-                        cartaoDomain.buscarPagamentosFaturaPorMesAndAno(fatura!!.id!!, mesId, ano)
+                        cartaoService.buscarPagamentosFaturaPorMesAndAno(fatura!!.id!!, mesId, ano)
                     if (pagamentos.isNotEmpty()) {
                         val valor = pagamentos.map { pagamento -> pagamento.valor!! }
                             .reduce { soma, next -> soma + next }
@@ -142,7 +145,7 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             if (cartao != null) buscarLancamentosCartao(cartao.id!!, month, year)
             cartaoViewModel.mesSelecionado.postValue(month)
             cartaoViewModel.anoSelecionado.postValue(year)
-            val faturaFechada = cartaoDomain.cartaoEstaFechado(cartao!!, month, year)
+            val faturaFechada = cartaoService.cartaoEstaFechado(cartao!!, month, year)
             desabilitarBotaoPagarFatura(faturaFechada, month, year)
         }
     }
@@ -150,8 +153,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
     private fun init() {
         val monthId = Calendar.getInstance().get(Calendar.MONTH) + 1
         this.calendarView.setMonth(monthId)
-        this.lancamentoDomain = LancamentoDomain(this.context!!)
-        this.cartaoDomain = CartaoDomain(this.context!!)
+        this.lancamentoService = LancamentoService(this.context!!)
+        this.cartaoService = CartaoService(this.context!!)
         this.cartaoViewModel.mesSelecionado.postValue(Calendar.getInstance().get(Calendar.MONTH) + 1)
         this.cartaoViewModel.anoSelecionado.postValue(Calendar.getInstance().get(Calendar.YEAR))
         buscarCartoes()
@@ -168,17 +171,28 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         })
 
         cartaoViewModel.lancamentos.observe(this, Observer {
-            this.txCartaoValorFatura.text = lancamentoDomain.calcularValorTotal(it).toString()
+            this.txCartaoValorFatura.text = lancamentoService.calcularValorTotal(it).toString()
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
+            val limite = cartaoService.calcularLimiteDisponivel(this.cartaoViewModel.cartaoSelecionado.value!!, it)
+            val valorTotalParcelado = lancamentoService.calcularValorTotalComprasParceladas(it)
+            this.txValorDisponivel.text = (limite - valorTotalParcelado).toString()
         })
 
         cartaoViewModel.cartaoSelecionado.observe(this, Observer {
             this.txCartaoDescricao.text = it.descricao
             val mes = cartaoViewModel.mesSelecionado.value!!
             val ano = cartaoViewModel.anoSelecionado.value!!
-            val faturaFechada = cartaoDomain.cartaoEstaFechado(it, mes, ano)
+            val faturaFechada = cartaoService.cartaoEstaFechado(it, mes, ano)
             desabilitarBotaoPagarFatura(faturaFechada, mes, ano)
+        })
+
+        cartaoViewModel.valorDisponivel.observe(this, Observer {
+            this.txValorDisponivel.text = it.toString()
+        })
+
+        cartaoViewModel.limitePercent.observe(this, Observer {
+            this.pbLimite.progress = it
         })
     }
 
@@ -191,17 +205,19 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
         this.calendarView.setOnMonthChangeListener(this)
         this.txPagoValor = root.findViewById(R.id.tx_pago_valor)
         this.txPago = root.findViewById(R.id.tx_pago)
+        this.pbLimite = root.findViewById(R.id.pb_limite)
+        this.txValorDisponivel = root.findViewById(R.id.tx_valor_disponivel)
         buildCrCartoes(root)
         buildRVLancamentos(root)
     }
 
     private fun buscarCartoes() {
-        val cartoes = cartaoDomain.buscarCartaoPorUsuario(Constantes.SYSTEM_USER)
+        val cartoes = cartaoService.buscarCartaoPorUsuario(Constantes.SYSTEM_USER)
         cartaoViewModel.cartoes.postValue(cartoes)
     }
 
     private fun deleteLancamento(lancamento: LancamentoVO) {
-        lancamentoDomain.removerLancamentoPorId(lancamento.id!!)
+        lancamentoService.removerLancamentoPorId(lancamento.id!!)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",
@@ -237,8 +253,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
     private fun buscarLancamentosCartao(cartaoId: Long, mes: Int, ano: Int) {
         val month = CustomCalendarView.getMonthDescription(mes)
-        val fatura = cartaoDomain.buscarFaturaPorCartaoMesEAno(cartaoId, month!!, ano)
-        val lancamentos = lancamentoDomain.buscarLancamentosDaFatura(fatura!!.id!!)
+        val fatura = cartaoService.buscarFaturaPorCartaoMesEAno(cartaoId, month!!, ano)
+        val lancamentos = lancamentoService.buscarLancamentosDaFatura(fatura!!.id!!)
         cartaoViewModel.lancamentos.postValue(lancamentos)
     }
 }

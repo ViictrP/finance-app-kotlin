@@ -29,5 +29,6 @@ class Constantes {
         val CARTAO_ID = "cartaoId"
         val DATA = "data"
         val SYSTEM_USER = 1L
+        val PARCELA_ID = "parcelaId"
     }
 }

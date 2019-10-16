@@ -17,7 +17,7 @@ import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
-import com.viictrp.financeapp.domain.LancamentoDomain
+import com.viictrp.financeapp.service.LancamentoService
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
@@ -38,7 +38,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
     private var etData: EditText? = null
     private var etQtParcelas: EditText? = null
 
-    private lateinit var lancamentoDomain: LancamentoDomain
+    private lateinit var lancamentoService: LancamentoService
 
     private var calendar = Calendar.getInstance()
 
@@ -54,7 +54,7 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         this.navController = view.findNavController()
         viewModel = ViewModelProviders.of(this).get(LancamentoViewModel::class.java)
-        this.lancamentoDomain = LancamentoDomain(this.context!!)
+        this.lancamentoService = LancamentoService(this.context!!)
         view.findViewById<CardView>(R.id.btn_salvar).setOnClickListener(this)
         viewModel.carteiraId.postValue(arguments?.getLong(Constantes.CARTEIRA_ID_KEY))
         viewModel.cartaoId.postValue(arguments?.getLong(Constantes.CARTAO_ID_KEY))
@@ -67,12 +67,12 @@ class LancamentoFragment : Fragment(), View.OnClickListener {
         val lancamento = getLancamento()
         this.viewModel.carteiraId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
-                lancamentoDomain.salvarNaCarteira(lancamento, it)
+                lancamentoService.salvarNaCarteira(lancamento, it)
             }
         }
         this.viewModel.cartaoId.value.let {
             if (it != null && it != Constantes.ZERO_LONG) {
-                lancamentoDomain.salvarNoCartao(lancamento, it)
+                lancamentoService.salvarNoCartao(lancamento, it)
             }
         }
         showMessageAndExit(

@@ -2,6 +2,7 @@
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:scrollbars="none">
@@ -14,7 +15,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="520dp"
+            android:layout_height="580dp"
             android:background="@color/white">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -90,6 +91,43 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView"
                 app:layout_constraintStart_toEndOf="@+id/textView"
                 app:layout_constraintTop_toTopOf="@+id/textView" />
+
+            <TextView
+                android:id="@+id/lb_valor_disponivel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Limite disponível"
+                android:textSize="15sp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/pb_limite"
+                app:layout_constraintStart_toStartOf="@+id/pb_limite" />
+
+            <com.viictrp.financeapp.ui.custom.RialTextView
+                android:id="@+id/tx_valor_disponivel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1000"
+                android:textSize="20sp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/pb_limite"
+                app:layout_constraintEnd_toEndOf="@+id/pb_limite" />
+
+            <ProgressBar
+                android:id="@+id/pb_limite"
+                style="@style/CustomProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginTop="30dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:progress="78"
+                android:theme="@style/CustomProgressBar"
+                app:layout_constraintBottom_toTopOf="@+id/calendarView_cartoes"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tx_valor_fatura" />
 
             <com.viictrp.financeapp.ui.custom.CustomCalendarView
                 android:id="@+id/calendarView_cartoes"

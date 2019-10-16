@@ -17,7 +17,7 @@ import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
-import com.viictrp.financeapp.domain.CartaoDomain
+import com.viictrp.financeapp.service.CartaoService
 import com.viictrp.financeapp.model.Cartao
 import com.viictrp.financeapp.ui.custom.CurrencyEditText
 import com.viictrp.financeapp.ui.custom.RialTextView
@@ -27,7 +27,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
 
     // Repositories
-    private lateinit var cartaoDomain: CartaoDomain
+    private lateinit var cartaoService: CartaoService
 
     // TextViews
     private lateinit var txValorLimite: RialTextView
@@ -56,7 +56,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(GerenciarCartaoViewModel::class.java)
         this.navController = view.findNavController()
-        this.cartaoDomain = CartaoDomain(this.context!!)
+        this.cartaoService = CartaoService(this.context!!)
         initComponents(view)
         initObservers()
     }
@@ -131,7 +131,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(button: View?) {
         val cartao = getCartao()
-        this.cartaoDomain.salvarCartao(cartao) {
+        this.cartaoService.salvarCartao(cartao) {
             Snackbar.make(
                 this.view!!,
                 "Cartão ${cartao.descricao} criado com sucesso.",

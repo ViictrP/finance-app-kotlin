@@ -1,8 +1,6 @@
-package com.viictrp.financeapp.domain
+package com.viictrp.financeapp.service
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.viictrp.financeapp.model.Lancamento
 import com.viictrp.financeapp.repository.LancamentoRepository
 import com.viictrp.financeapp.transformation.LancamentoAssembler
@@ -10,11 +8,11 @@ import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
-class LancamentoDomain(context: Context) {
+class LancamentoService(context: Context) {
 
     private val repository = LancamentoRepository(context)
-    private val cartaoDomain = CartaoDomain(context)
-    private val carteiraDomain = CarteiraDomain(context)
+    private val cartaoDomain = CartaoService(context)
+    private val carteiraDomain = CarteiraService(context)
 
     /**
      * Soma todos os valores dos lançamentos dentro da lista recebida
@@ -132,5 +130,11 @@ class LancamentoDomain(context: Context) {
             })
         }
         return list
+    }
+
+    fun calcularValorTotalComprasParceladas(lancamentos: List<LancamentoVO>): Double {
+        val lancamentosParcelados = lancamentos.filter { vo -> vo.parcelaId != null }
+        if (lancamentosParcelados.isEmpty()) return Constantes.ZERO.toDouble()
+        return Constantes.ZERO.toDouble() //TODO Corrigir a lógica de cálculo de parcelas
     }
 }

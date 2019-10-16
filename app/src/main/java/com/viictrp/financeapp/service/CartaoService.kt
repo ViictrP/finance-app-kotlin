@@ -1,4 +1,4 @@
-package com.viictrp.financeapp.domain
+package com.viictrp.financeapp.service
 
 import android.content.Context
 import com.viictrp.financeapp.exceptions.RealmNotFoundException
@@ -12,9 +12,10 @@ import com.viictrp.financeapp.transformation.FaturaAssembler
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.FaturaVO
+import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
-class CartaoDomain(context: Context) {
+class CartaoService(context: Context) {
 
     private val cartaoRepository = CartaoRepository(context)
     private val faturaRepository = FaturaRepository(context)
@@ -173,6 +174,18 @@ class CartaoDomain(context: Context) {
     ): List<PagamentoFatura> {
         val mes = CustomCalendarView.getMonthDescription(mesId)
         return pagamentoRepository.findByFaturaIdAndMesAndAno(faturaId, mes!!, ano)
+    }
+
+    fun calcularLimiteDisponivel(cartao: Cartao, lancamentos: List<LancamentoVO>): Double {
+        val totalPagamentos = obterPagamentosPorFaturaId(lancamentos.first().faturaId!!)
+        val valorTotal = lancamentos.map { vo -> vo.valor }.reduce { valor, valorTotal -> valor!! + valorTotal!! }
+        return cartao.limite!! - (valorTotal!! - totalPagamentos!!)
+    }
+
+    private fun obterPagamentosPorFaturaId(faturaId: Long): Double? {
+        val pagamentos = pagamentoRepository.findByFaturaId(faturaId)
+        if (pagamentos.isEmpty()) return Constantes.ZERO.toDouble()
+        return pagamentos.map { pg -> pg.valor }.reduce { valor, total -> valor!! + total!! }
     }
 }
 

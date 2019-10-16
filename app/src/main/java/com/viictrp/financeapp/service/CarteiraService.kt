@@ -1,4 +1,4 @@
-package com.viictrp.financeapp.domain
+package com.viictrp.financeapp.service
 
 import android.content.Context
 import com.viictrp.financeapp.model.Carteira
@@ -12,7 +12,7 @@ import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.CarteiraVO
 import com.viictrp.financeapp.viewObject.OrcamentoVO
 
-class CarteiraDomain(context: Context) {
+class CarteiraService(context: Context) {
 
     private val repository = CarteiraRepository(context)
     private val orcamentoRepository = OrcamentoRepository(context)

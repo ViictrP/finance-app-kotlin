@@ -6,7 +6,6 @@ import com.viictrp.financeapp.realm.RealmInitializer
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import io.realm.kotlin.deleteFromRealm
-import io.realm.kotlin.where
 import java.util.*
 
 class LancamentoRepository(private val context: Context) {
@@ -22,7 +21,7 @@ class LancamentoRepository(private val context: Context) {
         ultimoDia.set(Calendar.YEAR, primeiroDia.get(Calendar.YEAR))
         ultimoDia.set(Calendar.DAY_OF_MONTH, CustomCalendarView.ultimoDiaDoMes(mes))
         return realm.copyFromRealm(
-            realm.where<Lancamento>()
+            realm.where(Lancamento::class.java)
                 .equalTo(Constantes.CARTEIRA_ID, carteiraId)
                 .between(Constantes.DATA, primeiroDia.time, ultimoDia.time)
                 .findAll()
@@ -33,7 +32,7 @@ class LancamentoRepository(private val context: Context) {
     fun findLancamentosByFaturaId(faturaId: Long): List<Lancamento> {
         val realm = RealmInitializer.getInstance(this.context)
         return realm.copyFromRealm(
-            realm.where<Lancamento>()
+            realm.where(Lancamento::class.java)
                 .equalTo(Constantes.FATURA_ID, faturaId)
                 .findAll()
                 .toList()
@@ -43,7 +42,7 @@ class LancamentoRepository(private val context: Context) {
     fun save(lancamento: Lancamento): Lancamento {
         val realm = RealmInitializer.getInstance(this.context)
         realm.executeTransaction {
-            val lastId = it.where<Lancamento>().max(Constantes.ID)
+            val lastId = it.where(Lancamento::class.java).max(Constantes.ID)
             if (lastId != null) lancamento.id = lastId.toLong() + 1 else lancamento.id = 1
             it.insert(lancamento)
         }
@@ -53,10 +52,19 @@ class LancamentoRepository(private val context: Context) {
     fun deleteById(lancamentoId: Long) {
         val realm = RealmInitializer.getInstance(this.context)
         realm.executeTransaction {
-            it.where<Lancamento>()
+            it.where(Lancamento::class.java)
                 .equalTo(Constantes.ID, lancamentoId)
                 .findFirst()
                 ?.deleteFromRealm()
         }
+    }
+
+    fun findByParcelaId(parcelaId: String): List<Lancamento> {
+        val realm = RealmInitializer.getInstance(this.context)
+        return realm.copyFromRealm(
+            realm.where(Lancamento::class.java)
+                .equalTo(Constantes.PARCELA_ID, parcelaId)
+                .findAll()
+        )
     }
 }
