@@ -12,7 +12,6 @@ import com.viictrp.financeapp.transformation.FaturaAssembler
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.utils.Constantes
 import com.viictrp.financeapp.viewObject.FaturaVO
-import com.viictrp.financeapp.viewObject.LancamentoVO
 import java.util.*
 
 class CartaoService(context: Context) {
@@ -134,11 +133,16 @@ class CartaoService(context: Context) {
         fatura.pago = true
         faturaRepository.update(FaturaAssembler.instance.toEntity(fatura))
         pagamentoRepository.save(pagamento)
+        val cartao = cartaoRepository.findById(fatura.cartaoId!!)
+        cartao?.let {
+            it.limiteDisponivel = it.limiteDisponivel!! + valor
+            cartaoRepository.update(it)
+        }
     }
 
     /**
      * Cria um novo pagamento dado o valor e o ID da fatura
-     * @param faturaId - ID da fatura
+     * @param fatura - a fatura
      * @param valor - valor do pagamento
      * @return {PagamentoFatura}
      */
@@ -176,16 +180,17 @@ class CartaoService(context: Context) {
         return pagamentoRepository.findByFaturaIdAndMesAndAno(faturaId, mes!!, ano)
     }
 
-    fun calcularLimiteDisponivel(cartao: Cartao, lancamentos: List<LancamentoVO>): Double {
-        val totalPagamentos = obterPagamentosPorFaturaId(lancamentos.first().faturaId!!)
-        val valorTotal = lancamentos.map { vo -> vo.valor }.reduce { valor, valorTotal -> valor!! + valorTotal!! }
-        return cartao.limite!! - (valorTotal!! - totalPagamentos!!)
+    private fun obterPagamentosPorFaturaId(faturaId: Long): List<PagamentoFatura>? {
+        return pagamentoRepository.findByFaturaId(faturaId)
     }
 
-    private fun obterPagamentosPorFaturaId(faturaId: Long): Double? {
-        val pagamentos = pagamentoRepository.findByFaturaId(faturaId)
-        if (pagamentos.isEmpty()) return Constantes.ZERO.toDouble()
-        return pagamentos.map { pg -> pg.valor }.reduce { valor, total -> valor!! + total!! }
+    @Throws(RealmNotFoundException::class)
+    fun somarAoLimiteDisponivelDoCartao(cartaoId: Long, valor: Double) {
+        val cartao = cartaoRepository.findById(cartaoId)
+        cartao?.let {
+            it.limiteDisponivel = it.limiteDisponivel!! - valor
+            cartaoRepository.update(it)
+        }
     }
 }
 

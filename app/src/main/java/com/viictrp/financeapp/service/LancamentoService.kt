@@ -62,10 +62,16 @@ class LancamentoService(context: Context) {
     fun salvarNoCartao(lancamento: Lancamento, cartaoId: Long) {
         if (lancamento.quantidadeParcelas > Constantes.UM) {
             val lancamentos = clonar(lancamento, lancamento.quantidadeParcelas)
+            val valorTotal =
+                calcularValorTotal(LancamentoAssembler.instance.toViewObject(lancamentos))
+            cartaoDomain.somarAoLimiteDisponivelDoCartao(cartaoId, valorTotal)
             lancamentos.forEach {
                 salvarNaFatura(it, cartaoId)
             }
-        } else salvarNaFatura(lancamento, cartaoId)
+        } else {
+            salvarNaFatura(lancamento, cartaoId)
+            cartaoDomain.somarAoLimiteDisponivelDoCartao(cartaoId, lancamento.valor!!)
+        }
     }
 
     /**
@@ -130,11 +136,5 @@ class LancamentoService(context: Context) {
             })
         }
         return list
-    }
-
-    fun calcularValorTotalComprasParceladas(lancamentos: List<LancamentoVO>): Double {
-        val lancamentosParcelados = lancamentos.filter { vo -> vo.parcelaId != null }
-        if (lancamentosParcelados.isEmpty()) return Constantes.ZERO.toDouble()
-        return Constantes.ZERO.toDouble() //TODO Corrigir a lógica de cálculo de parcelas
     }
 }

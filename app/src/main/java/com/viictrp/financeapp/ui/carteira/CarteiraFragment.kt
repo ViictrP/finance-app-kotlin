@@ -31,6 +31,7 @@ import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
 import com.viictrp.financeapp.utils.Constantes
+import com.viictrp.financeapp.utils.NumberOperations
 import com.viictrp.financeapp.utils.StatusBarTheme
 import com.viictrp.financeapp.utils.SwipeToDeleteCallback
 import com.viictrp.financeapp.viewObject.LancamentoVO
@@ -176,10 +177,8 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
      * @param valorTotalOrcamento - valor total do orçamento do mês
      */
     private fun calcularPorcentagemProgressBar(valorTotal: Double, valorTotalOrcamento: Double) {
-        val progress =
-            if (valorTotal >= valorTotalOrcamento) 100
-            else ((valorTotal / valorTotalOrcamento) * 100).toInt()
-        this.carteiraViewModel.progressBarProgress.postValue(progress)
+        val progress = NumberOperations.getPercentFrom(valorTotal, valorTotalOrcamento)
+        this.carteiraViewModel.progressBarProgress.postValue(progress.toInt())
     }
 
     /**

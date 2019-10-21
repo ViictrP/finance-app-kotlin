@@ -90,7 +90,7 @@ class GerenciarFaturaFragment : Fragment(), View.OnClickListener {
             this.valor = saldo
             this.numeroParcela = Constantes.UM
             this.faturaId = fatura.id!!
-            this.descricao = "Saldo da fatura ${fatura.mes!!}/${fatura.ano!!}"
+            this.descricao = "Saldo ${fatura.mes!!}/${fatura.ano!!}"
             this.data = obterDataNovoLancamento(faturaFechada)
             this.titulo = this.descricao
         }

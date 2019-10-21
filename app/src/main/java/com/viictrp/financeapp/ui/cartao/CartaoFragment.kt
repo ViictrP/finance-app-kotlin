@@ -122,17 +122,8 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
                 val pago = if (fatura != null) fatura.pago!! else false
                 this.btnPagarFatura.isEnabled = faturaFechada && !pago
                 this.btnNovoLancamento.isEnabled = !faturaFechada
-                if (pago) {
-                    val pagamentos =
-                        cartaoService.buscarPagamentosFaturaPorMesAndAno(fatura!!.id!!, mesId, ano)
-                    if (pagamentos.isNotEmpty()) {
-                        val valor = pagamentos.map { pagamento -> pagamento.valor!! }
-                            .reduce { soma, next -> soma + next }
-                        this.txPagoValor.text = "$valor"
-                        this.txPago.visibility = View.VISIBLE
-                        this.txPagoValor.visibility = View.VISIBLE
-                    }
-                } else {
+                if (pago) cartaoViewModel.faturaPaga.postValue(fatura)
+                else {
                     this.txPago.visibility = View.GONE
                     this.txPagoValor.visibility = View.GONE
                 }
@@ -174,13 +165,13 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
             this.txCartaoValorFatura.text = lancamentoService.calcularValorTotal(it).toString()
             val adapter = this.rvLancamentos.adapter as LancamentoAdapter
             adapter.setList(it.toMutableList())
-            val limite = cartaoService.calcularLimiteDisponivel(this.cartaoViewModel.cartaoSelecionado.value!!, it)
-            val valorTotalParcelado = lancamentoService.calcularValorTotalComprasParceladas(it)
-            this.txValorDisponivel.text = (limite - valorTotalParcelado).toString()
         })
 
         cartaoViewModel.cartaoSelecionado.observe(this, Observer {
             this.txCartaoDescricao.text = it.descricao
+            this.txValorDisponivel.text = "${it.limiteDisponivel!!}"
+            val progress = NumberOperations.getPercentFrom(it.limiteDisponivel!!, it.limite!!)
+            this.pbLimite.progress = progress.toInt()
             val mes = cartaoViewModel.mesSelecionado.value!!
             val ano = cartaoViewModel.anoSelecionado.value!!
             val faturaFechada = cartaoService.cartaoEstaFechado(it, mes, ano)
@@ -193,6 +184,24 @@ class CartaoFragment : Fragment(), OnClickListener, OnMonthChangeListener, OnIte
 
         cartaoViewModel.limitePercent.observe(this, Observer {
             this.pbLimite.progress = it
+        })
+
+        cartaoViewModel.faturaPaga.observe(this, Observer { fatura ->
+            val mesId = CustomCalendarView.getMonthId(fatura.mes!!)!!
+            val pagamentos =
+                cartaoService.buscarPagamentosFaturaPorMesAndAno(fatura.id!!, mesId, fatura.ano!!)
+            if (pagamentos.isNotEmpty()) {
+                val lancamentos = lancamentoService.buscarLancamentosDaFatura(fatura.id!!)
+                val valorLancamentos = lancamentoService.calcularValorTotal(lancamentos)
+                val valor = pagamentos.map { pagamento -> pagamento.valor!! }
+                    .reduce { soma, next -> soma + next }
+
+                if (valorLancamentos != valor) {
+                    this.txPagoValor.text = "$valor"
+                    this.txPagoValor.visibility = View.VISIBLE
+                }
+                this.txPago.visibility = View.VISIBLE
+            }
         })
     }
 

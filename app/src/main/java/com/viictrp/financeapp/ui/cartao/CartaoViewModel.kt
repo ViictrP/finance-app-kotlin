@@ -3,6 +3,7 @@ package com.viictrp.financeapp.ui.cartao
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.viictrp.financeapp.model.Cartao
+import com.viictrp.financeapp.viewObject.FaturaVO
 import com.viictrp.financeapp.viewObject.LancamentoVO
 
 class CartaoViewModel : ViewModel() {
@@ -14,4 +15,5 @@ class CartaoViewModel : ViewModel() {
     val anoSelecionado: MutableLiveData<Int> = MutableLiveData()
     val limitePercent: MutableLiveData<Int> = MutableLiveData()
     val valorDisponivel: MutableLiveData<Double> = MutableLiveData()
+    val faturaPaga: MutableLiveData<FaturaVO> = MutableLiveData()
 }

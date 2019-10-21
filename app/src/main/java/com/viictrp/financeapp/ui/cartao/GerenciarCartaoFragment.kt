@@ -146,6 +146,7 @@ class GerenciarCartaoFragment : Fragment(), View.OnClickListener {
             this.descricao = etDescricaoNovoCartao.text.toString()
             this.dataFechamento = etDiaFechamento.text.toString().toLong()
             this.limite = etLimite.currencyDouble
+            this.limiteDisponivel = this.limite
             this.bandeira = etBandeiraNovoCartao.text.toString()
             this.numeroCartao = etUltimosDigitos.text.toString()
             this.usuarioId = 1L
