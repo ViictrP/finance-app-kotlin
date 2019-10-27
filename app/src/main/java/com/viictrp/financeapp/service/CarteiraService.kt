@@ -17,32 +17,16 @@ class CarteiraService(context: Context) {
     private val repository = CarteiraRepository(context)
     private val orcamentoRepository = OrcamentoRepository(context)
 
-    /**
-     * Salva a nova carteira no banco de dados
-     * @param carteira - nova carteira
-     * @return {CarteiraVO}
-     */
     private fun save(carteira: Carteira): CarteiraVO {
         repository.save(carteira)
         return CarteiraAssembler.instance.toViewObject(carteira)
     }
 
-    /**
-     * Busca uma carteira para o ID fornecido
-     * @param carteiraId - ID da carteira
-     * @return {CarteiraVO}
-     */
     fun buscarCarteiraPorId(carteiraId: Long): CarteiraVO {
         val carteira = repository.findById(carteiraId)
         return CarteiraAssembler.instance.toViewObject(carteira!!)
     }
 
-    /**
-     * Busca uma carteira para o mês e ano fornecidos.
-     * @param mes - mês da carteira
-     * @param ano - ano da carteira
-     * @return {CarteiraVO}
-     */
     fun buscarPorMesEAno(mes: Int, ano: Int): CarteiraVO? {
         val month = CustomCalendarView.getMonthDescription(mes)
         val carteira = this.repository.findCarteiraByMes(month!!, ano)
@@ -55,12 +39,6 @@ class CarteiraService(context: Context) {
         }
     }
 
-    /**
-     * Cria uma nova carteira caso não exista carteiras para o mês atual
-     * @param mes - mês da carteira
-     * @param ano - ano da carteira
-     * @return {CarteiraVO}
-     */
     private fun criarNovaCarteira(mes: String, ano: Int): CarteiraVO {
         val carteira = Carteira().apply {
             this.usuarioId = 1
@@ -73,14 +51,6 @@ class CarteiraService(context: Context) {
         return carteiraVO
     }
 
-    /**
-     * Cria um novo orçamento para carteira, onde será armazenado o valor
-     * do orçamento do mês
-     * @param carteiraId - Código da carteira
-     * @param mes - mês da carteira
-     * @param ano - ano da carteira
-     * @return {OrcamentoVO}
-     */
     private fun criarNovoOrcamento(carteiraId: Long?, mes: String?, ano: Int?): OrcamentoVO {
         val orcamento = orcamentoRepository.save(Orcamento().apply {
             this.carteiraId = carteiraId

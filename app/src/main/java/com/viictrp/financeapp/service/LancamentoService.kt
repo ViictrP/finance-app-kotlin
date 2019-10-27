@@ -14,51 +14,26 @@ class LancamentoService(context: Context) {
     private val cartaoDomain = CartaoService(context)
     private val carteiraDomain = CarteiraService(context)
 
-    /**
-     * Soma todos os valores dos lançamentos dentro da lista recebida
-     * @param lancamentos Lista de lançamentos
-     */
     fun calcularValorTotal(lancamentos: List<LancamentoVO>): Double {
         if (lancamentos.isEmpty()) return Constantes.ZERO.toDouble()
         return lancamentos.map { lancamento -> lancamento.valor!! }
             .reduce { soma, next -> soma + next }
     }
 
-    /**
-     * Apaga um lançamento do banco de dados
-     * @param lancamento Lançamento que será apagado
-     */
     fun removerLancamentoPorId(lancamentoId: Long) {
         repository.deleteById(lancamentoId)
     }
 
-    /**
-     * Busca os lançamentos da fatura
-     * @param faturaId Código da fatura
-     */
     fun buscarLancamentosDaFatura(faturaId: Long): List<LancamentoVO> {
         val lancamentos = repository.findLancamentosByFaturaId(faturaId)
         return LancamentoAssembler.instance.toViewObject(lancamentos)
     }
 
-    /**
-     * Busca os lançamentos da carteira para o período do mês e ano informados
-     * @param carteiraId código da carteira
-     * @param mes mês do lançamento
-     * @param ano ano do lançamento
-     * @return lista de lançamentos
-     */
     fun buscarLancamentosDaCarteira(carteiraId: Long, mes: Int, ano: Int): List<LancamentoVO> {
         val lancamentos = repository.findLancamentosByCarteiraId(carteiraId, mes, ano)
         return LancamentoAssembler.instance.toViewObject(lancamentos)
     }
 
-    /**
-     * Salva um novo lançamento na fatura do cartão de acordo com a data
-     * do lançamento.
-     * @param lancamento - novo lançamento
-     * @param cartaoId - código do cartão
-     */
     fun salvarNoCartao(lancamento: Lancamento, cartaoId: Long) {
         if (lancamento.quantidadeParcelas > Constantes.UM) {
             val lancamentos = clonar(lancamento, lancamento.quantidadeParcelas)
@@ -74,11 +49,6 @@ class LancamentoService(context: Context) {
         }
     }
 
-    /**
-     * Salva o lançamento na fatura de acordo com a data de lançamento
-     * @param lancamento - novo lançamento
-     * @param cartaoId - código do cartão
-     */
     private fun salvarNaFatura(lancamento: Lancamento, cartaoId: Long) {
         val calendar = Calendar.getInstance()
         calendar.time = lancamento.data!!
@@ -93,11 +63,6 @@ class LancamentoService(context: Context) {
         repository.save(lancamento)
     }
 
-    /**
-     * Salva o lançamento na carteira de acordo com a data do lançamento
-     * @param lancamento - novo lançamento
-     * @param carteiraId - código da carteira
-     */
     fun salvarNaCarteira(lancamento: Lancamento, carteiraId: Long) {
         if (carteiraId != Constantes.ZERO_LONG) {
             val carteira = carteiraDomain.buscarCarteiraPorId(carteiraId)
@@ -106,13 +71,6 @@ class LancamentoService(context: Context) {
         }
     }
 
-    /**
-     * Clona os lançamentos para a quantidade de parcelas fornecidas e os salva nas
-     * respectivas faturas.
-     * @param lancamento - lançamento que será clonado
-     * @param quantidadeParcelas - quantidade de clones que serão gerados
-     * @return {List<Lancamento>}
-     */
     private fun clonar(lancamento: Lancamento, quantidadeParcelas: Int): List<Lancamento> {
         val list = mutableListOf(lancamento)
         val calendar = Calendar.getInstance()

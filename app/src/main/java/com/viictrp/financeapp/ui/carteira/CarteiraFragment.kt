@@ -24,9 +24,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.viictrp.financeapp.MainActivity
 import com.viictrp.financeapp.R
 import com.viictrp.financeapp.adapter.LancamentoAdapter
+import com.viictrp.financeapp.model.Lancamento
+import com.viictrp.financeapp.service.CartaoService
 import com.viictrp.financeapp.service.CarteiraService
 import com.viictrp.financeapp.service.LancamentoService
-import com.viictrp.financeapp.repository.OrcamentoRepository
 import com.viictrp.financeapp.ui.custom.CustomCalendarView
 import com.viictrp.financeapp.ui.custom.CustomCalendarView.OnMonthChangeListener
 import com.viictrp.financeapp.ui.custom.RialTextView
@@ -42,7 +43,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
     private var navController: NavController? = null
     private lateinit var carteiraViewModel: CarteiraViewModel
     private lateinit var txValorOrcamento: RialTextView
-    private lateinit var txGastoAteMomento: TextView
+    private lateinit var txGastoAteMomento: RialTextView
     private lateinit var rvLancamentos: RecyclerView
     private lateinit var pbOrcamento: ProgressBar
     private lateinit var calendarView: CustomCalendarView
@@ -50,7 +51,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
 
     private lateinit var lancamentoService: LancamentoService
     private lateinit var carteiraService: CarteiraService
-    private lateinit var orcamentoRepository: OrcamentoRepository
+    private lateinit var cartaoService: CartaoService
+
+    private var lancamentosHolder = mutableListOf<LancamentoVO>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,6 +69,12 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         carteiraViewModel = ViewModelProviders.of(this).get(CarteiraViewModel::class.java)
         StatusBarTheme.setLightStatusBar(view, this.activity!!)
         navController = view.findNavController()
+        initChildren(view)
+        buildModelObservers(view)
+        init()
+    }
+
+    private fun initChildren(view: View) {
         this.pbOrcamento = view.findViewById(R.id.pb_orcamento)
         this.txValorOrcamento = view.findViewById(R.id.tx_vl_orcamento)
         this.txGastoAteMomento = view.findViewById(R.id.tx_gasto_ate_momento)
@@ -74,8 +83,6 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         this.calendarView.setOnMonthChangeListener(this)
         view.findViewById<Button>(R.id.btn_orcamento).setOnClickListener(this)
         view.findViewById<Button>(R.id.btn_novo_lancamento).setOnClickListener(this)
-        buildModelObservers(view)
-        init()
     }
 
     override fun onClick(view: View?) {
@@ -99,9 +106,16 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         this.loadCarteira(month, year)
     }
 
-    /**
-     * Inicializa os observers
-     */
+
+    private fun loadCarteira(mes: Int, ano: Int) {
+        val carteira = carteiraService.buscarPorMesEAno(mes, ano)
+        carteiraViewModel.carteira.postValue(carteira)
+        val lancamentos = lancamentoService.buscarLancamentosDaCarteira(carteira!!.id!!, mes, ano)
+        this.lancamentosHolder = lancamentos.toMutableList()
+        carteiraViewModel.lancamentos.postValue(lancamentos)
+        calcularValorTotalGasto(lancamentos, carteira.orcamento!!.valor!!)
+    }
+
     private fun buildModelObservers(root: View) {
         this.rvLancamentos = buildRecyclerView(root)
 
@@ -122,68 +136,32 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         })
     }
 
-    /**
-     * Busca a carteira do mês
-     */
-    private fun loadCarteira(mes: Int, ano: Int) {
-        val carteira = carteiraService.buscarPorMesEAno(mes, ano)
-        carteiraViewModel.carteira.postValue(carteira)
-        val lancamentos = lancamentoService.buscarLancamentosDaCarteira(carteira!!.id!!, mes, ano)
-        carteiraViewModel.lancamentos.postValue(lancamentos)
-        calcularValorTotalGasto(lancamentos, carteira.orcamento!!.valor!!)
-    }
-
-    /**
-     * Inicializa os campos da tela
-     */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun init() {
         this.calendarView.setMonth(Calendar.getInstance().get(Calendar.MONTH) + 1)
         this.lancamentoService = LancamentoService(this.context!!)
         this.carteiraService = CarteiraService(this.context!!)
-        this.orcamentoRepository = OrcamentoRepository(this.context!!)
+        this.cartaoService = CartaoService(this.context!!)
         loadCarteira(
             Calendar.getInstance().get(Calendar.MONTH) + 1,
             Calendar.getInstance().get(Calendar.YEAR)
         )
     }
 
-    /**
-     * Calcula o valor total de lançamentos para setar o progresso do pnOrcamento.
-     *
-     * @param lancamentos - lançamentos da carteira
-     * @param valorTotalOrcamento - valor do orçamento do mês
-     */
-    private fun calcularValorTotalGasto(
-        lancamentos: List<LancamentoVO>?,
-        valorTotalOrcamento: Double
-    ) {
-        var valorTotal = 0.0
-        lancamentos?.forEach {
-            it.valor.let { value ->
-                valorTotal += value!!
-            }
-        }
-        this.txGastoAteMomento.text =
-            "$valorTotal".substring(0, valorTotal.toString().indexOf(".") + 2)
-        calcularPorcentagemProgressBar(valorTotal, valorTotalOrcamento)
+    private fun calcularValorTotalGasto(lancamentos: List<LancamentoVO>?, valorTotalOrcamento: Double) {
+        val calendar = Calendar.getInstance()
+        val valorTotal = lancamentoService.calcularValorTotal(lancamentos!!)
+        val valorTotalCartoes = obterValorTotalFaturasEmGeral(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR))
+        val valor = valorTotal + valorTotalCartoes
+        this.txGastoAteMomento.text = "$valor"
+        calcularPorcentagemProgressBar(valor, valorTotalOrcamento)
     }
 
-    /**
-     * Calcula o progresso do pbOrcamento de acordo com o valor total dos lançamentos
-     * e o valor do orçamento do mês
-     *
-     * @param valorTotal - valor total dos lançamentos
-     * @param valorTotalOrcamento - valor total do orçamento do mês
-     */
     private fun calcularPorcentagemProgressBar(valorTotal: Double, valorTotalOrcamento: Double) {
         val progress = NumberOperations.getPercentFrom(valorTotal, valorTotalOrcamento)
         this.carteiraViewModel.progressBarProgress.postValue(progress.toInt())
     }
 
-    /**
-     * Construindo a RecyclerView para listar os lançamentos
-     */
     private fun buildRecyclerView(root: View): RecyclerView {
         val context = this.context!!
         val rvLancamentos: RecyclerView = root.findViewById(R.id.rv_lancamentos)
@@ -217,6 +195,33 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             "Lançamento excluído com sucesso.",
             Snackbar.LENGTH_SHORT
         ).show()
+    }
+
+    private fun obterValorTotalFaturasEmGeral(mesId: Int, ano: Int): Double {
+        var valorTotal = 0.0
+        val cartoes = cartaoService.buscarCartaoPorUsuario(Constantes.SYSTEM_USER)
+        val mes = CustomCalendarView.getMonthDescription(mesId)!!
+        cartoes.forEach {
+            val fatura = cartaoService.buscarFaturaPorCartaoMesEAno(it.id!!, mes, ano)
+            fatura?.let { f ->
+                val lancamentos = lancamentoService.buscarLancamentosDaFatura(f.id!!)
+                val valorLancamentos = lancamentoService.calcularValorTotal(lancamentos)
+                valorTotal += valorLancamentos
+                val lancamento = LancamentoVO().apply {
+                    this.numeroParcela = 1
+                    this.quantidadeParcelas = 1
+                    this.valor = valorLancamentos
+                    this.carteiraId = carteiraViewModel.carteira.value?.id
+                    this.data = Date()
+                    this.descricao = "Fatura do cartão ${it.descricao}"
+                    this.titulo = "${it.descricao}"
+                }
+                lancamentosHolder.add(lancamento)
+            }
+
+        }
+        carteiraViewModel.lancamentos.postValue(lancamentosHolder)
+        return valorTotal
     }
 
 }
