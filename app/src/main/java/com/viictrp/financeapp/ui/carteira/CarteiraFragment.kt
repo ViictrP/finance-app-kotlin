@@ -125,6 +125,7 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
             val orcamento = carteiraViewModel.carteira.value!!.orcamento
             val valorLancamentos = lancamentoService.calcularValorTotal(it)
             txValorDisponivel.text = "${orcamento!!.valor!! - valorLancamentos}"
+            txGastoAteMomento.text = "$valorLancamentos"
         })
 
         carteiraViewModel.progressBarProgress.observe(this, Observer {
@@ -148,12 +149,17 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
         )
     }
 
-    private fun calcularValorTotalGasto(lancamentos: List<LancamentoVO>?, valorTotalOrcamento: Double) {
+    private fun calcularValorTotalGasto(
+        lancamentos: List<LancamentoVO>?,
+        valorTotalOrcamento: Double
+    ) {
         val calendar = Calendar.getInstance()
         val valorTotal = lancamentoService.calcularValorTotal(lancamentos!!)
-        val valorTotalCartoes = obterValorTotalFaturasEmGeral(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR))
+        val valorTotalCartoes = obterValorTotalFaturasEmGeral(
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.YEAR)
+        )
         val valor = valorTotal + valorTotalCartoes
-        this.txGastoAteMomento.text = "$valor"
         calcularPorcentagemProgressBar(valor, valorTotalOrcamento)
     }
 
@@ -173,12 +179,8 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
                 val position = viewHolder.adapterPosition
                 val adapter = (rvLancamentos.adapter as LancamentoAdapter)
                 val lancamento = adapter.getList()!![position]
-                removerLancamentoPorId(lancamento.id!!)
-                adapter.removeAt(position)
-                calcularValorTotalGasto(
-                    adapter.getList(),
-                    carteiraViewModel.carteira.value!!.orcamento!!.valor!!
-                )
+                if (lancamento.id != null) removerLancamentoPorId(lancamento.id!!)
+                else adapter.notifyDataSetChanged()
             }
         }
 
@@ -190,6 +192,9 @@ class CarteiraFragment : Fragment(), OnClickListener, OnMonthChangeListener {
 
     fun removerLancamentoPorId(lancamentoId: Long) {
         lancamentoService.removerLancamentoPorId(lancamentoId)
+        val lancamento = lancamentosHolder.find { it.id!! == lancamentoId }
+        lancamentosHolder.removeAt(lancamentosHolder.indexOf(lancamento))
+        carteiraViewModel.lancamentos.postValue(lancamentosHolder)
         Snackbar.make(
             this.view!!,
             "Lançamento excluído com sucesso.",
